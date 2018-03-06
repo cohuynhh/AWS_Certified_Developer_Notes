@@ -23,7 +23,7 @@
 - Consists in VMs inside the AWS platform (physical as well)
 
 #### EC2 Container Service
-- Run and manage Docker container at scan_length
+- Run and manage Docker container at scale
 
 #### Elastic Beanstalk
 - For devs who don't understand AWS and just want to upload and focus on code
@@ -44,7 +44,7 @@
   - Version of EC2
   - Worry about underlying OS
 
-### Batch
+#### Batch
 - Batch computing in the cloud
 
 ### Storage
