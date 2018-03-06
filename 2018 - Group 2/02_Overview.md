@@ -243,7 +243,7 @@ Produce software packages ready to deploy
 
 #### Polly
 - Takes text and turns it into speech
-- choose from different languages, regions, accents
+- Choose from different languages, regions, accents
 
 #### Rekognition
 - Video and images, uploads a file to it and it will tell you what is in that file
@@ -281,7 +281,7 @@ Produce software packages ready to deploy
 - A way of moving data between different AWS services
 
 #### Glue
-- Used for ETL
+- Used for ETL (Extract, Transformation and Load)
 
 ### Security & Identity & Compliance
 #### IAM
