@@ -69,7 +69,7 @@
 
 ### Second scenario (Role)
 
-The same as first scenario, but in this time the application will use IAM role to interact with S3.
+- The same as first scenario, but in this time the application will use IAM role to interact with S3.
 =============================================
 
 ## Active Directory Federation
