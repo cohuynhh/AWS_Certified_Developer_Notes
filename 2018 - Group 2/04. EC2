@@ -1,0 +1,111 @@
+AWS CLI (Command Line)
+
+Using credentials
+
+You can access your AWS from a command line, for example the Mac’s command line by using the ssh command. The next example allows you to use your EC2 instance from the command line:
+		ssh user@ec2.public.ip.adreess -i yourCredencials.pem
+
+Once you log into the EC2 instance you can elevate your privileges using the command: 
+
+		sudo su
+
+At this point you will be able to use the AWS CLI just type aws + the service you want to use + commands associated with that service, for example you can see your buckets stored on the S3 service by using this command:
+
+		aws s3 ls
+
+If you get a a message saying that it can’t locate your credentials, you have to configure them using this command:
+
+		aws configure
+
+Now the aws will guide you on what fields you need to provide in order to store your credentials. Those credentials need to be valid and active ones related to the user and region you want to get access to AWS CLI. The fields are:
+
+AWS Access Key (User) 
+AWS Secret Access Key (User)
+Region (your region)
+Output format (This can be without any value)
+
+You can type the command help to get info about all available commands for a certain service, for example:
+
+		aws s3 help
+
+Let’s use the AWS CLI to terminate an EC2 instance:
+
+Get the instance ID -> aws ec2 describe-instances
+Locate your running EC2 and get the InstanceId
+Terminate the instance -> aws ec2 terminate-instances --instance-ids yourIstanceId
+Check the result on the AWS console
+
+
+
+Since your credential are being stored in your EC2 instance there’s a risk of someone stole those credential, specially if you have your SSH configured to allow connections. You can see your stored credentials on the .aws file in your home directory:
+
+		cd ~
+		cd .aws 
+		ls
+	
+A good practice is to delete the user you use to get into the AWS CLI to be 100% sure that your account is secured.
+
+Using roles
+
+This option allows to use your AWS CLI without leaving your credentials stored into your EC2 instance. This means that your account will be more secure.
+
+Create an EC2 instance. Skip this if you already have one
+Create a Role into your instance. You can also attach Roles to your running EC2 instance.  
+SSH into your EC2 instance
+Use the service you have permission to use on you instance.
+
+As simple and secure as that. It’s a good practice to configure your region on your EC2 instance by using the aws configure command. MAKE SURE TO LEAVE ALL OTHER FIELDS BLANK.
+
+CLI commands for the developers exam
+
+A very useful URL related to the CLI commands is: https://docs.aws.amazon.com/cli/latest/reference/ec2/index.html
+
+The main commands you’ll need to learn, for exam purposes, are:
+
+		describe-instances
+		describe-images (this can take time to load)
+		run-instances (Use this to create EC2 instances)
+		terminate-instances (You can terminate one or more instances)
+
+If you need to use those commands with specific parameters, you have to see it on the URL provided above. There’re a lot of useful examples and information there.
+
+S3 CLI and Regions
+
+This subject is only for information purposes, not for exam purposes.
+
+Important thoughts about S3 and regions:
+
+You can create buckets on any region
+You can use S3 CLI to download the content of any bucket into your current EC2 instance (sometimes you have to write the region your EC2 instance is, depending on the region where the bucket you’re trying to download is)
+To access and download a bucket from the S3 CLI you can use:
+		aws s3 cp --recursive s3://bucketName /locationOnTheEC2Instance
+		aws s3 cp --recursive s3://bucketName /locationOnTheEC2Instance - -region your-ec2-region
+
+Bash Scripting
+
+This is the way how you can execute several commands at the start of a EC2. You can create the bash when creating the instance on the Step 3 section Advanced Details. You have to start the bash with the line #!/bin/bash
+
+Example to update the EC2 instance, install Apache and start it, check Apache config and download an index.html into the Apache www/html directory:
+
+		#!/bin/bash
+		yum update -y
+		yum install httpd -y
+		service httpd start
+		chkconfig httpd on
+		aws s3 cp s3://mywebsitebucket/index.html /var/www/html
+
+Installing PHP & Composer
+
+This Lab is very straight forward so just pay attention and understand how the shell file was created.
+
+URL to install Composer: https://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/installation.html
+
+Using PHP SDK to access s3
+
+Another pretty straight forward lab…
+
+EC2 Instance Metadata
+
+This is an important part of the exam. Memorise  the URL: http://169.254.169.254/latest/meta-data/
+
+Useful documentaiion: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
