@@ -1,3 +1,182 @@
+## EC2 Elastic compute
+
+Web service that provides resizable compute capacity in the cloud.  
+Reduces the time required to obtain and boot new services instances to minutes. 
+Allows quickly scale capacity up and down, as your computing requirements change.
+Only pay for the capacity that you actually use. 
+Provides developers tools for build failure resilient application and isolate themselves from common failure scenarios.
+
+Windows - linux
+
+Startups AirBnB and Uber. Experiment for a very low cost. 
+
+
+## EC2 options
+On demand - allow you to pay a fixed rate by the hour or by the second with no commitment.
+Reserved - provide you with a capacity reservation, and offer a significant discount on the hourly charge for an instance. 1 year or 3 year terms.
+Spot - enable you to bid water price you want for instance capacity, providing for even greater savings if your applications have flexible start and end times. Terminated or stop
+Dedicated hosts - physical EC2 server dedicated for your use. Dedicated host can help you reduce costs by allowing you to use your existing server-bound software licenses.
+
+### On demand 
+ - Low costs and flexibly on front term. 
+ - Short term.
+ - Develop or tested in the first time.
+
+### Reserved (Instance attributes, term commitment, payment option) Workload is predictable
+ - Steady state or predictable usage.
+ - Require a reserved capacity.
+ - Able to make upfront payments to reduce their total computing costs 
+
+### Standard
+Convertible RI’s Reserve instances 
+Scheduled RI’s available to launch within.
+Instance attributes
+Instance type m3.xlarge
+Availability zone
+Tenancy platform
+Term commitment 
+1 years 
+3 years
+Pay upfront 
+Payment option
+If you don’t need it, be a third party seller in the instance marketplace
+Save about 75%
+All sold by AWS or third party sellers at lower cost
+
+#### Spot
+ - That have flexible start and end times.
+ - That are only feasible at very low compute prices.
+ - Big data processing 
+ - Sunday 3am when prices are very low
+ - Users with urgent computing needs for large amounts of additional capacity
+ - Benefits
+    - EC2 instances at savings of up to 90% the on-demand price
+
+
+### Dedicated hosts
+ - Useful for regulatory requirements that may not support multi-tenant virtualization.
+ - Great for licensing which does not support multi-tenancy or cloud deployments.
+ - Can be purchased on-demand hourly
+ - Can be purchased as a reservation for up to 70% off the on-demand price.
+
+M4 default use
+T2 will be used all the course, low price small db services
+P2 Bitcoin mining
+
+DR MC GIFT PX
+
+## EBS Elastic block store
+
+Allow you to create storage volumes and attach them to Amazon EC2 instances. Once attached, you can create a file system on top of those volumes, run a database, or use them in any other way you would use a block device. Amazon EBS volumes are placed in a specific availability zone, where they are automatically replicated to protect you from the failure of a single component. 
+
+## EBS volume types
+
+### General purpose SSD (GP2)
+ - General purpose, balances both price and performance.  
+ - Ratio of 3 IOPS per GB with up to 10,000 IOPS and the ability to burst up to 3000 IOPS for extended periods of time for volumes at 3334 GiB and above. 
+
+### Provisioned IOPS SSD (IO1)
+ - Designed for I/O intensive applications such as large relational or NoSQL databases.
+ - Use if you need more than 10,000 IOPS
+ - Can provision up to 20,000 IOPS per volume
+ - Throughput Optimized HDD (ST1) magnetic
+ - Big data
+ - Data warehouses
+ - Log processing
+ - Cannot be a boot volume 
+
+### Cold HDD (SC1)
+ - Lowest cost storage for infrequently accessed workloads.
+ - File server
+ - Magnetic standard
+ - Lowest cost per gigabyte of all BS volume types that is bootable. Magnetic volumes are ideal for workloads where data is accessed infrequently, and applications where the lowest storage cost is important.
+
+
+### EC2 exam tips
+Know the differences between
+ - On demand
+ - Spot
+ - Reserved
+ - Dedicated hosts
+ - Cases that you need to calculate how much do you need to pay for an instance
+
+### Remember with spot instances
+ - If you terminate the instance, you pay for the hour
+ - If AWS terminates the spot instances, you get the hour it was terminated in for free.
+ - EBS.
+
+### EBS consists of:
+ - SSD, General purpose - GP2 - (Up to 10,000 IOPS)
+ - SSD, Provisioned IOPS - IO1 - (More than 10,000 IOPS)
+ - HDD, Throughput Optimized - ST1 - frequently accessed workloads.
+ - HDD, Cold - SC1 - less frequently accessed data.
+ - HDD, Magnetic - Standard - cheap, infrequently accessed storage.
+
+
+You cannot mount 1 EBS volume to multiple EC2 instances, instead use EFS
+
+What happens if you delete an EC2 instance?, what happens to the EBS volumen that is attached to that?
+
+Tags help us to control costs, tag everything
+
+
+### Lab summary 
+- Termination protection is turned off by default, you must turn it on during the setup.
+
+EBS-backed instance the default root mount is deleted when the instance is terminated. Cannot be encrypted. Third party tools to encrypt and create a copy encrypted the volume.
+
+### Security group is a visual firewall
+
+ - Instance can have multiple security groups
+ - Immediately after changing a security rule.
+ - All inbound traffic is blocked by default
+ - All outbound traffic is allowed
+ - Changes to security groups take effect immediately
+ - You can have any number of EC2 instances within a security group
+ - You can have multiple security group attached to EC2 instances
+ - Security groups are stateful 
+ - if you create an inbound rule allowing traffic in, that traffic is automatically allowed back out again.
+ - You cannot block specific ip addresses using security groups, instead use network access to control lists
+ - You can allow rules but not denied rules. 
+
+
+### EBS volumes
+
+ - EC2 and EBS need to be in the same zone cannot be mixed
+ - Modifying volume won’t have down time, only performance issues
+ - The only way to move volume to another availability zone is to create an snapshot and then copy a volume
+ - Volumes exist on EBS
+ - Snapshots exist on S3
+ - Snapshots are point in time copies of volumes 
+ - Snapshot are incremental - this means that only the blocks that have changed since your last snapshot are moved to S3
+ - If this is your first snapshot it will take time to create
+
+### Snapshots of root device volumes
+ - To create a snapshot for Amazon EBS volumes that serve as root devices, you should stop the instance before taking the snapshot.
+ - However you can take a snap while the instance is running.
+ - You can create AMI’s (Amazon Machine Images) from both volumes and snapshots.
+ - You can change EBS volume sized on the fly, including changing the size and storage type.
+ - Volumes will always be in the same availability zone as the EC2 instance.
+ - To move an EC2 volume from one AZ/Region to another, take a snap or an image of it, then copy it to the new AZ/region
+ - Snapshots of encrypted volumes are encrypted automatically
+ - Volumes restored from encrypted snapshots are encrypted automatically
+ - You can share snapshots, but only if they are unencrypted
+ - these snapshots can be shared with other AWS accounts or made public.
+
+### EFS (Elastic file system) lab is not in the exam yet 
+Understand it before taking the exam. 
+Is a file storage service for Amazon Elastic Compute Cloud (Amazon EC2) instances. Is easy to use and provides a simple interface that allows you to create and configure file systems quickly and easily. With Amazon EFS, storage capacity is elastic, growing and shrinking automatically as you add and remove files, so your applications have the storage they need, when they need it. 
+
+### EFS Features 
+ - Supports the network file system version 4 (NFSv4) protocol
+ - You only pay for the storage you use (No pre-provisioning required )$0.30 per giga 
+ - Can scale up to the petabytes
+ - Can support thousands of concurrent NFSconnections 
+ - Data is stored across multiple AZ’s within a region
+ - Read After Write Consistency
+ - Load balancer, mount EFS between 2 
+ - Only supported in west oregon
+
 AWS CLI (Command Line)
 
 Using credentials
