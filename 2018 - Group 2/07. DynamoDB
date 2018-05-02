@@ -1,0 +1,83 @@
+What’s DynamoDB?
+
+Is a fast and flexible NoSQL(No Relational) database service for all applications that need consistent, single-digit millisecond latency at any scale. It’s fully managed and supports document and key-value data models. It’s great for mobile, web, gaming, ad-tech,IoT and many other applications.
+
+Facts:
+	Stored on SSD
+	Spread across 3 GEOGRAPHICAL distinct data centers
+	Eventual Consistent Reads (Default): Fast Reading, usually reached within a second. If your app needs fast data retrieval use 	this setting.
+	Strong Consistent Reads. Slower than Eventual, but it’s used to always keep your app data consistent and updated.
+
+Basics:
+	Tables
+	Items = row table
+	Attributes = column table
+Items on DynamoDB table support a max 35 levels of nesting data.
+
+Pricing:
+	Capacity: Write $0.0065 per hour every 10 writes. 
+	          Read $0.0065 per hour every 50 reads.
+	Storage: Free 25 Gb per month. Then $0.25 Gb per month.
+	The free tier offers 25 reads/writes
+
+Simple LAB
+
+DynamoDB Indexes & Streams
+
+	Primary keys:  Partition: Single Attribute (Unique ID). This is called Partition Key or Hash Key. NO ITEMS IN A TABLE CAN HAVE THE SAME PARTITION KEY VALUE.
+		       Composite: consist on 2 attributes to compose the key. Example ID+Date (Partition Key + Sort Key) as one Key. CAN HAVE THE SAME PARTITION KEY BUT DIFFERENT SORT KEY.
+
+	Indexes: Local Secondary Index: Has the SAME Partition key, but different sort key. Can ONLY be created when creating the table. You can have up to 5 per table
+		 Global Secondary Index: Has DIFFERENT Partition key AND different sort key. Can be created when creating the table or added later. You can have up to 5 per table
+
+	Streams: Captures modifications of the DynamoDB Tables data. On INSERT it takes a snapshot of the data incoming, on UPDATE it captures the “before” and “after” of any attributes that were modified and on DELETE it captures an 				image of the item before it was deleted. Streams are stored for 24 hours max.
+
+You can export items from a table to a CSV file. You can simply push a button and the data base will scale as needed (Example Black Friday). You can create triggers on DynamoDB to a lambda function.
+
+Query: Finds items on a table using only primary key attribute values(Partition key). You can optionally use a sort key to refine the results. The Query always returns all attributes for item, but you can use ProjectionExpression parameter to select the attributes you need. The results are always sorted by the sort key, numeric order os ASCII char code order. Default order is ascending. To reverse the order set the ScanIndexForward parameter to false. By default the reads are eventually consistent but you can change it to strongly consistent.
+
+Scan: Examines every item in the table. By Default the scan returns all attributes for item, but you can use ProjectionExpression parameter to select the attributes you need.
+
+Query is more efficient than a scan. Scan always dumps the entire table and examines every item and then cuts the non desired data from the result set.
+
+How to calculate provision throughput: APRENDA A HACERLO EN LA MENTE.
+
+	Unit of read = 4Kb. Eventual Consistent reads consists of 2 reads per sec
+			    Strongly Consistent reads consists of 1 per sec
+
+	Unit of write = 1Kb. All write are 1 write per sec
+
+FORMULAS: (Size of read rounded to nearest increment 4Kb / 4Kb) x number of items = read throughput   Divide by 2 if eventually consistent.
+			
+ 	   Items x Kb = write throughput
+
+Example 1: Read 10 items of 6 Kb per second using eventually consistent.
+		Calculate read units =  Size of read rounded to nearest 4Kb = 6 Kb rounded to the nearest increment 4Kb = 8
+		(Size of read rounded to nearest 4Kb / 4Kb) = 8Kb/4Kb = 2 read unit per item.
+		(Size of read rounded to nearest 4Kb / 4Kb) x number of items = 2 x 10 = 20
+		Divide by 2 if eventually consistent = 20 / 2 = 10
+Answer 10 units of read throughput. The final answer is always rounded up.
+
+Example 2: write 5 items of 10Kb per second.
+		   5 x 10 = 50
+Answer 50 units of write throughput
+
+If you exceed the the max allowed provisioned throughput for a table or for 1 or more global secondary indexes you will get an 400 http error code - ProvisionedThroughputExceededException
+
+Web Identity Providers with DynamoDb
+
+You can use Web Identity providers (FB, Google, Amazon, etc) to authenticate by using AssumeRoleWithWebIdentity API. You need to create the role first.
+
+Steps:
+	1. Authenticate with ID provider (like FB)
+	2. You get a Token passed by the provider
+	3. You code calls AssumeRoleWithWebIdentity API and provides the token and specify the ARN for the IAM Role. You can find the ARNs for every AWS here: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arns-syntax
+	4. The app can now access DynamoDb from between 15 mins to 1 hour(Default)
+
+Important aspects of DynamoDB
+
+	Conditional Writes: You can put conditions to write request. This means that the data will only be updated if the request fulfills the condition. This prevents the inconsistency on data that could be updated with different values at the same time.
+	
+	Atomic Counters: When you use the UpdateItem operation to increment or decrement the value of an attribute without interfering with other requests. It doesn’t use conditions this will always update the attribute, may cause data consistency 		issues.
+
+	Batch Operations: Use BatchGetItem to get up to 1Mb of data (100 items). In addition it can retrieve items from multiple tables.
