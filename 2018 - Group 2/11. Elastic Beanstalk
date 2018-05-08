@@ -1,0 +1,41 @@
+Elastic Beanstalk
+
+You can deploy, monitor and scale an application quickly
+Provides developer or end users to provision application infrastructure in an almost transparent way.
+
+A GUI for AWS
+Infrastructure highly abstract focus, focus in components and performance, not configurations and specifications.
+
+Applications are the high level structure in beanstalk.
+Either an entire application can be an EB app, or each logical component can be an EB app or EB environment within an app.
+
+Applications can have multiple environments: prod, staging, dev, or functional type (Front-End, Back-End)
+
+Environments are either single instance or scalable
+Environments are either web server environments or worker environments
+
+Application versions are unique packages which represent versions of apps
+An application is uploaded to Beanstalk as an application bundle - .zip
+Each app an have multiple versions 1:N
+Application version can be deployed to environments within an application
+
+Exam tip: know the type of applications that can be deployed to EB: PHP, JAVA, Node.js
+
+Exam Tips:
++ Can have multiple versions of the application
++ Applications can be split into tiers (web/app/db)
++ App can be updated
++ Config can be updated
++ Updates can be 1 instance at a time, a % of instances or an immutable update
++ You pay for the resources you use, but EB is free
++ If EB creates the RDS, it will get deleted if EB app is deleted. If not, RDS instance remains.
+Servers:
++ Apache Tomcat for Java
++ Apache HTTP server for PHP
++ Apache HTTP server for Phython
++ Nginx or Apache HTTP server for Node.js
++ Passenger or Puma for Ruby
++ MS IIS 7.5, 8.0 and 8.5 for .NET apps
++ Java SE
++ Docker
++ Go
