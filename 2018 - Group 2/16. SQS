@@ -1,0 +1,47 @@
+Simple Queue Service
+
+Web service that gives access to a message queue that can be used to store messages while waiting for a computer to process them.
+
+A queue is a temporary repository. It decouples the producer of a message with its clients in such a way that if the producer server goes down, the messages are still stored.
+
+Example: Email queue to notify clients about an order confirmation
+
+Messages can contain up to 256kb of text in any format. Any component can retrieve the messages programmatically using Amazon SQS API.
+
+The queue acts as a buffer between the component producing and saving data, and the component receiving the data for processing.
+
+The queue resolves issues that arise if the producer is producing faster that the consumer can process it, or if the producer and consumer are only intermittently connected to the network. 
+
+Ensures deliver of message at least once.
+Supports multiple producers/readers interacting with same queue with no need of coordination with each other.
+
+Engineered to always be available and deliver messages.
+FIFO is not guarantee. Order of delivery is not important.
+Sequencing information can be added to messages to reorder them.
+
+** Messages are always pulled (not pushm in contrast to SNS)
+
+There is a visibility timeout clock (only starts when application server picks up the message, this guarantees at least one reading). 12 hours max timeout, 30s by default
+
+Visibility timeout can be extended per request basis by calling ChangeMessageVisibility
+
+Message life cycle is completed when it gets deleted from queue
+
+Auto scaling can be setup to hit a queue size threshold. 
+
+Most of time a message will be delivered once, but applications need to be engineered to avoid conflicts if message is delivered more than once.
+
+Billed at 64kb chunks 
+
+Pricing:
+First 1 millions requests per month are free
+$0.50 per million extra ($0.00000005 per SQS request
+)
+A single message can have 1 - 10 messages (256kb max)
+Each 64kb chunk is billed as 1 request
+
+SQS long polling vs short polling. A way to save money by avoiding empty response It has a 20s timeout.	
+
+SQS Fanning out
+
+A topic is created using SNS. Then create and subscribe multiple SQS queue to the SNS topic.
