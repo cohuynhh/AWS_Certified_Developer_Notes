@@ -5,23 +5,27 @@ A web service that makes easy to coordinate work across distributed application 
 Examples: media processing, web app backends, business process work flows, analytics pipelines.
 
 These are designed as coordination of tasks. 
-Tasks represent invocations of various processing steps in an application: executable code, web service calls, human actions, and scripts.
+Tasks represent invocations of various processing steps in an application: executable code, web service calls, 
+human actions, and scripts.
 
 Workers are programs that interact with Amazon SWF to get tasks, process received tasks, and return results.
 
-The decider is a program that controls the coordination of tasks, i.e. their ordering, concurrency, and scheduling according to the application logic.
+The decider is a program that controls the coordination of tasks, i.e. their ordering, concurrency, 
+and scheduling according to the application logic.
 
 Workers and deciders can run on cloud infrastructure: EC2, or machines behind firewalls. 
 
 Deciders can view the progress of tasks and can initiate new tasks in an ongoing manner.
 
-SWF store tasks, assign them to workers when ready, and monitors their progress. Ensures task assigned once with no duplication. 
+SWF store tasks, assign them to workers when ready, and monitors their progress. 
+Ensures task assigned once with no duplication. 
 
 Workers and deciders don’t keep track of execution state. They can run independently and scale quickly.
 
 SWF Domains
 
-Everything is scoped to a domain. Domains isolate a set of types, executions, and tasks lists from others within the same account.
+Everything is scoped to a domain. Domains isolate a set of types, executions, and tasks lists from others 
+within the same account.
 
 Domains can be registered with AWS console or SWF API
 + Parameters specified in JSON notation
