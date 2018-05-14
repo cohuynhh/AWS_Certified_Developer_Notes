@@ -1,1 +1,0 @@
-# AWS_Certified_Developer_Notes

@@ -1,0 +1,111 @@
+EC2 Part 3
+
+Instance Metadata
+	Can be used to configure the instance, only accessible within the instance. Not protected, be careful to not store sensitive data. NOT BILLED
+	Use Case:
+		Small web servers, the are loaded using the same AMI but are modified at launch time with a script using the metadata for the instance.
+
+	Throttled requests
+		connections are limited recommendation to cache until they expire, or use a exponential backoff
+
+	Need to know from memory url to access instance metadata
+		http://169.254.169.254/latest/meta-data/
+	Example
+		https://github.com/ACloudGuru/metadata/blob/master/curlexample.php
+
+	Custom example (how to upgrate to java 1.8.0)
+		sudo yum install java-1.8.0
+		sudo yum remove java-1.7.0-openjdk
+		Upload jar
+			scp path/to/jar ec2-user@machine-ip:~
+
+
+
+Load Balancers 
+	Cost Money!
+	Have DNS Name no IP address provided
+	Can be internal or external, are configured to listen to a port
+	If it's on a failed state won't send traffic to the instance
+	Can be linked to multiple EC2 instances
+	Instances are reported as InService/OutOfService
+	Configurable with Route53 to have DNS failover
+
+	3 Types:
+		Application: Work at the app layer, preferred for http and https, http status code can be configured
+		Network: TCP
+		Prev generation: Http/https and tcp <- Classic for dev cert
+
+	https://aws.amazon.com/elasticloadbalancing/faqs/
+
+SDK List
+	Some have default region, if not defaults to us-east-1
+	Languages:
+		AWS mobile
+		AWS IoT device
+		Android, iOS, JAvascript
+		Java -> has default region!
+		.Net
+		NodeJS -> doesn't have default
+		PHP
+		Python
+		Ruby
+		Go
+		C++
+
+Lambda
+	Serverless
+	Data Center -> IaaS(EC2) -> PaaS -> Containers(docker) -> Serverless
+
+	It's a compute service where one can upload code, it encapsulates all underlying services needed for the code to run
+
+	Use Cases:
+		- Every time an event is fired
+		- Response to http requests(using API Gateway or API calls using SDKs)
+
+	Can communicate to AWS services 
+	Can trigger other lambdas(events)
+	1 lambda running per event/request.
+
+	Types of triggers:
+		API Gateway
+		AWS IoT
+		Alexa Skills Kit
+		Alexa Smart Home
+		CloudFront
+		CloudWatch Events
+		CloudWatch Logs
+		CodeCommit
+		Cognito Sync Trigger
+		DynamoDB
+		Kinesis
+		S3
+		SNS
+	Languages
+		NodeJS
+		Go
+		C#
+		Java
+		Python
+
+	Cost
+		1000000 free per month
+		$0.20 every million after the first one
+		Cheapest
+
+	Duration
+		Calculated from the moment code starts until it returns and ir rounded to nearest 100millisecond
+		Top limit is 5 minutes
+
+	Can get complicated,can do things globally
+
+Summary
+
+Instance Store -> Ephemeral storage
+Instance Store if underlying host fails then data is lost
+EBS prevents this from happening
+REboot won't make me lose my data
+RAID Array?
+Cloud watch?
+Read after write consistency -> once file/object is uploaded it can be read
+
+

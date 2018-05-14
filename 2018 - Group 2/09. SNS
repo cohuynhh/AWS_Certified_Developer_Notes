@@ -1,0 +1,30 @@
+SNS - Simple Notification Service
+
+A web service that makes easy to setup , operate and send notifications from the cloud.
+
+Publishes messages from one application and immediately delivers them to subscriber or other apps.
+
+Follows the “publish-subscribe” messaging paradigm. Notifications are delivered using a push mechanism
+avoiding the periodically check (poll/pull).
+
+Push notifications to Apple, Google, Fire OS and Windows devices, as well as Android devices in China with Baidu Cloud Push.
+
+Besides mobile devices: SMS, email, SQS or HTTP endpoint
+
+To prevent messages lost, all messages published are stored redundantly in multiple availability zones.
+
+A topic allows to group multiple recipients. One topic can deliver to multiple endpoint types. 
+
+Inexpensive, pay as you go
+
+Web based AWS management console
+
+SNS pricing
+$0.5 per million SNS requests
+$0.6 per 100,000 notifications deliveries over http
+$0.75 per 100 SMS notifications
+$2 per 100,000 email notifications
+
+JSON format
+
+Subscribers need confirmation before receiving messages
