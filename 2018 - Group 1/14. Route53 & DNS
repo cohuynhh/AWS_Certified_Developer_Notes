@@ -1,0 +1,143 @@
+Chapter 79) Route53 - Register a domain
+
+Its not part of the free tier
+Prices https://aws.amazon.com/route53/pricing/
+Email verification
+Domain registration may take 3 days to complete
+You need the NS (Name server) record and the SOA (Start Of Authority) record
+
+Chapter 80) Setup EC2 instances and ELB
+
+Chapter 81) Routing policies
+
+-Simple:
+
+Its the default routing policy when you created a new record set
+
+user -> route 53 -> EC2 instance
+
+-Weighted
+
+Route 53 can split the traffic and send for instance 20% to one region
+and 80% to another one
+
+Can be two different ELB in the same Region
+
+Also is used to redirect certain amount of traffic to a testing env the rest to the actual prod env
+
+-Latency
+
+Allows to redirect traffic based on the lower network latency for your end user.
+The latency routing based policies create a latency resource record set for Amazon EC@ or ELB in each region hosting 
+our website, when Route53 receives a query for your website, it selects the latency resource record for the region that
+gives the lower latency, Route 53 then respond with the value associated with that record.
+
+Person in south africa -> 		route 53
+						
+					us-east-2				ap-southeast-2
+					(latency 50 ms)			(latency 300ms)
+					
+					Route 53 will send
+					the traffic to us-east-2
+					
+-Failover
+This applies when you want to create a active/passive setup.
+Like having a primary website in one region and a backup one in another one
+Route 53 will monitor the health of your primary site using a health check
+
+Health check is created in Rout53 dashboard
+
+-Geo location
+Lets you route the traffic based on customers geo location
+Can be specified by continent, country or state(US)
+
+Person in US -> 				route 53
+						
+					us-east-2					ap-southeast-2
+					Route 53 will send			(South Africa Region)	
+					the traffic to us-east-2
+					
+Person in Europe -> 				route 53
+						
+													Route 53 will send				
+						us-east-2					eu-west-2
+										            the traffic to us-east-2
+                                
+DNS 101
+
+* Think of a phone book
+* DNS translates IP and URLs to human friendly address
+* IPv4 (32 bits) and IPv6 (128 bits)
+
+*Top level domains
+
+* Top level domain names are controlled by IANA (Internet Assigned Numbers Authority)
+* Domain registrars:
+	-In charge of organize and guarantee unique domain names.
+	-ie GoDaddy ...
+
+* SOA (Start of authority) Records
+	The SOA record stores information about:
+		The name of the server that supplied the data for the zone
+		The administrator of the zone
+		The current version of the data file
+		The number of seconds a secondary name server needs to wait before checking for updates.
+		The number of seconds a secondary name server needs to wait before retrying a failed zone transfer.
+		The maximun number of seconds that a secondary name server can use data before it must be either refreshed or expired.
+	    The default number of seconds of the TTL file on resource records.
+
+
+* NS Records
+   Name server records and are used by top level domain servers to direct traffic to the content DNS which contains the authoritative DNS record.
+   
+* A records
+   Is the fundamental type of DNS record and the A stands for Address
+   The A record is used by the computer to translate the name of the domain to a specific IP address.
+   
+***ELB doesnt have a IPv4 or v6 IP address, it only has a DNS URL.
+
+* TTL Record
+	-Is the time that a DNS record is gonna be cached on the resolver server or the user own local PC, it is defined in seconds.
+ 	-The lower TTL, the faster DNS records changes take to propage thru the internet.
+ 	-DNS migration, drop the TTL to 5 min (Normally they are set to 2 days), wait 2 days
+ 	
+* CNAMES
+	-Canonical name: can be used to resolve one domain name to another.
+
+* Alias record
+	-Used to map resource record sets in your hosted zone to elastic load balancers, cloud front dists, pr S3 buckets that are configured as web sites.
+	-Alias works similar to CNAME in the sense that you can map a DNS domain to another one.
+	-Key difference: CNAME cant be used for naked domain names (Zone apex record), you cant have a CNAME for https://acloud.guru, it should be an A record or
+	an Alias.
+	-Alias resources save you time because Route53 automatically recognizes changes in the record sets that the alias resource record set refers to.
+	-For example supposed that an alias record set for example.com points to an ELB at xxxx.xxx, if the IP address of the load balancer changes, Amazon route
+	53 will automatically reflect those changes to example.com without any changes to the hosted zone that contains the record for example.com 
+	 
+* Exam tips:
+	-ELB doesnt have a pre-defined IPv4. you resolve them using a DNS name
+	-Alias record allows to resolve naked domain name to an ELB DNS address
+	-CNAME vs Alias record, you will be charge if you make a request to Route53 thru CNAME, free if you Alias record
+	
+	
+ 	
+   
+	    
+                                
+                                
+#Summary
+
+ELB never dont have an IP4 address, only DNS name.
+Alias record (You can resolve AWS components) vs CNAME
+In exam, always select alias record over CNAME
+
+Route53
+Routing policies
+Simple
+Weighted 
+Latency
+Failover
+Geolocation
+
+
+
+
