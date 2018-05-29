@@ -1,3 +1,188 @@
+EC2 Part 2 (Franklin)
+
+*EBS Volumens*
+
+-Can you have one EC2 instance running in one availability zone and have a EBS volume in another availability zone?
+NO they have to be in the same availability zone.
+Avoid latency and IO overhead
+
+-We can modify the volume if it ain’t standard magnetic type.
+Can be done on the fly - introduce overhead of course.
+
+-How to create a volume in another EC2 instance or availability zone?
+Take a snapshot of the EC2 volumes
+
+-How to move a EC2 volume from one region to another
+Create a snapshot of the volume
+Then copy it and select the new region where you have your new EC2 instance
+
+Or Simply go to the EC2 instance -> actions -> create image -> select the volumes you wanna include
+
+-Snapshots vs Images
+Snapshots are used for backups
+Images used to create EC2 volumes from
+
+-When you terminate an EC2 instance only the root volume gets terminated the rest of volumes for that EC2 remain available
+
+Summary:
+
+Volumes exist on EBS
+	Virtual hard disk
+	root volume - where your OS lives
+Snapshots are saved in S3
+	Point in time copy of your drive
+	Snaps are incremental only new changes are moved to S3
+	First snaps take time to be created
+	Stop instance before snapping a root volume
+	You can create AMI’s from both volumes and snaps
+You can change EBS volumes on the fly (size storage type)
+Volumes will be ALWAYS in the same availability zone as your EC2 instance
+To move a volumen from one AZ/Region to another -> take a snap/image of it -> copy to a new AZ/region
+Snaps of scripted volumes are scripted automatically
+Volumes restored from encrypted snaps are encrypted automatically
+You can share snaps only if they are unencrypted
+	They can be shared among other AWS accounts or made public
+
+Big central repository
+
+*EFS*
+
+Elastic File System
+*Not yet in the exam*
+
+File Storage service for AWS EC2 Instances.
+Storage is increased or decreased depending on usage
+
+Supports NFSv4
+You pay what you use
+Can support thousand concurrent connections
+Data stored across multiple AZ’s with in a region
+EFS block-based storage vs S3 object based storage
+
+*When setting up the EFS now we can change 
+	Perfomance mode
+
+	We recommend General Purpose performance mode for most file systems. Max I/O performance mode is optimized for applications where tens, hundreds, or thousands of EC2 instances are accessing the file system — it scales to higher levels of aggregate throughput and operations per second with a tradeoff of slightly higher latencies for file operations.
+	General Purpose (default)
+	Max I/O
+
+	Encryption
+
+Enable encryption
+If you enable encryption for your file system, all data on your file system will be encrypted at rest. You can select a KMS key from your account to protect your file system, or you can provide the ARN of a key from a different account. Encryption can only be enabled during file system creation.
+
+Loadbalancer
+
+Current version allows to select upfront the type (http / tcp) or you can select the create load balancer thru classic interface
+
+EC2 instances should have the same security groups as the EFS instance created
+
+Scalable until petabytes
+
+*Using CLI - Credentials*
+
+user: #
+pass: #
+
+access key: #
+secret access key: #
+
+Credentials are store locally on the EC2 instance in
+
+/.aws/credentials
+
+Describe all instances running in EC2
+aws ec2 describe-instances
+
+Terminate an instance from CLI
+aws ec2 terminate-instances --instance-ids i-00dfb6763584fefd2
+
+Never put access keys on GitHub - if you did delete users with programatic access from IAM - users
+Generate new keys
+
+*AWS CLI Using roles*
+
+Credentials are stored locally on the EC2 instance
+What happens if that EC2 is hacked?
+Having keys hardcoded there is a security risk
+
+Solution: AWS Roles 
+
+Roles are global
+
+Next create an EC2 instance as usual, in the step 3 configure instance, in the IAM role dropdown list select the role created to manage S3 access.
+
+Can you detach attach IAM roles to a running instance? now its possible.
+
+So now login as usual to the EC2 instance, so now try 
+
+aws s3 ls
+
+It works directly now no programatic access was required
+
+Check there is no .aws directory on root level
+
+You can set the default region, it will create the .aws directory and the file config with the region info
+
+So if this EC2 is hacked there is no risk with accessing the access keys
+
+*CLI Commands Exam Lab*
+
+https://docs.aws.amazon.com/cli/latest/reference/ec2/
+
+Three basic commands
+
+aws ec2 describe-instances
+Describe all current running instances
+
+*--region
+
+aws ec2 describe-images
+Describe all images available to you
+
+aws ec2 run-instances
+
+aws ec2 run-instances --image-id ami-f63b1193 --count 1 --instance-type t2.micro --key-name MyEc2KeyPair --security-group-ids sg-982bdcf3 --subnet-id subnet-7626723b
+
+aws ec2 terminate-instances --instance-ids i-1234567890abcdef0
+
+*start/stop to start-stop instances
+*To create instances run-instances
+
+*S3 CLI’s and regions*
+
+Attach access role to an EC2 instance from CLI
+Now you can browse the buckets from the EC2 instance
+
+aws s3 cp --recursive s3://ffallasa201-apsoutheast2 /home/ec2-user
+
+*You probably need to specify the region in the S3 cp command if the bucket you are trying to copy from is located in a region that requires signature version 4.
+
+aws s3 cp --recursive s3://ffallasa201-apsoutheast2 /home/ec2-user --region $region
+
+*Bash scripting*
+
+Put the txt/script you want to execute on the EC2 configure instance (Step 3) -> advance details:
+
+#!bin/bash
+yum update -y
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+aws s3 cp s3://mywebsitebucket-ffallasa201/index.html /var/www/html
+
+So that bash script will be executed automatically for us during EC2 instance initialization.
+
+You can also upload a bash script file.
+
+*Installing PHP and Composer*
+
+https://s3-eu-west-1.amazonaws.com/acloudguru-sharedbucket/s3bootstrap.sh
+
+Copy the script text in the EC2 configure instance -> text so its loaded automatically.
+
+https://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/installation.html
+
 EC2 Part 3
 
 Instance Metadata
