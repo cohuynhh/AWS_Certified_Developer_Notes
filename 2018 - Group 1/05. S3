@@ -1,0 +1,330 @@
+
+#S3 PART 3.
+Cloud front.
+
+CDN Content delivery network that deliver web pages and web content depending on user's geo location.
+
+	Edge location: location where content will be cached.
+	Separate to the AZ/RG
+	
+	Origin: origin of the files that CDN will distribute.
+	Can be S3 bucket, EC2 instance, Route53, ELB
+	Common cases: S3 bucket, EC2 instance, EC2 instance with ELB
+	
+	Distribution: name given to the CDN, consist of a collection of edge locations.
+	
+	Example: there are over 50 edge locations all over the world
+	
+	User request a file, the request goes to the Edge location, if it is not there, the edge location do a pull from the s3 bucket for example
+	and caches it.
+	For the first users is not that fast if the resource it asks for is not cached, for the next user the resource will be already cached so
+	the overall response is going to be faster.
+	
+	CDN can be used to deliver an entire web site including dynamic, static, streaming and interactive content using a global network of edge 
+	locations, requests will be routed to the nearest edge location.
+	
+	It is optimized to work with the following AWS solutions:
+	S3
+	EC2
+	ELB
+	Route53
+	
+	Works as well with non-AWS servers which stores the original, definitive versions of your files.
+	
+	Web distributions: typically used for web sites
+	RTMP: used for media streaming.
+	
+	Edge locations are not READ only, you can change a file in the edgelocation and it will be replicated to the origin server
+	Objects are cached and held on the edge locations based on the TTL of the object
+	Object can be cleaned manually, but you will be charged
+	
+Create a CDN
+	
+	Create our own dist Lab.
+	
+	Types of distribution:
+	
+	Web: web pages, HTTP HTTPS media files dist, objects CRUD thru web forms, live streaming
+	
+	RTMP: helps to speed up streaming of file using the Adobe Flash Media RTMP protocol, allows to reproduce a file even though it hasnt been
+	downloaded completely to the edge location
+		You have to put your media files in a S3 bucket
+		
+	Set the TTL based on how frequent your objects changes, manual clean is going to cost you.
+	
+	Restrict viewer access could be by signed URL or cookies, to control that only you can have access to the resource you are supposed to see 
+	and noone else.
+	
+	Geo restrictions - configure what countries can access or what countries cant, not both. (whitelist or blacklist)
+	
+	*Invalidation - allows remove objects from all edge locations, it will cost you.
+	
+	Is not only for downloading but also for uploading
+	
+S3 Security and encryption
+
+	All newly created buckets are private
+	Configure access to bucket:
+		Bucket policies (Apply to the bucket and content)
+		ACL (Apply to objects)
+	S3 configure to create access bucket logs
+	Encryption
+		-In transit: when you send data from your PC to the bucket
+		SSL/TLs
+		-At rest:
+			Server side encryption
+				S3 managed keys - SSE - S3
+				Each object encrypted with a key / the key for each object is encrypted with a master key - AES 256 algoritm 
+			AWS key management Service, Managed key, SSE - KMS
+				Provide audit tools to see who decrypt encrypt
+				Create a managed encryption key
+			Server side encryption with customer provided keys, SSE - C
+				You manage encryption keys
+				Amazon manages encryption decryption
+		-Client side encryption
+				You encrypt your objects and upload them to S3 bucket
+				
+Storage gateway:
+
+	Its a service that provides connectivity between on-premises software appliances cloud-based storage with AWS storage infrastructure, 
+	the service enables you to securely store your data to AWS in a cost effective way.
+	
+	Data Center -> Storage Gateway -> AWS (S3, Glacier)
+	
+	It is installed as a VM (It is associated to an AWS account and it is available in the AWS console after activation process)
+	
+	Four types of storage gateways:
+	
+	-File gateway (NFS): store objects directly to S3
+	-Volume gateway (iSCSI): block based storage, store OS, virtual hard disk
+		-Stored volumens: store an entire copy of your data set
+	 	-cached volumens: store most recent access data
+	-Tape gateway (VTL): backup archiving solution, virtual tapes
+	
+	File gateway (NFS):
+	
+	Files are stored as objects in the S3 bucket, accessed thru Network File System mount point.
+	Ownership, timestamps permissions are stored as object metadata.
+	Once the objects are store in the bucket, all S3 features can be applied to it (lifecycle management, versioning, cross region replication, etc)
+	
+	Volume gateways (iSCSI):
+	
+	Virtual hard disk
+	Data written to those volumens can be async backed up as point in time snapshots of the volumes and stored in the cloud as EBS snapshots
+	Snapshots are incremental, only changed blocks are captured
+	Snapshot storage is compressed to minimize costs
+	
+		Stored volume:
+		Allows you to have the primary data in premise while backing it up async to AWS
+		The data is backed up to S3 in the form of Elastic Block Storage snapshots
+		Volumes sizes goes from 1GB to 16TB
+		Multipart uploads
+		Complete copy of your data on site, complete copy incrementally on S3
+		
+		Cached volumes:
+		Uses S3 to store your primary data while keeping the most frequented accessed data on promises
+		1 GB to 32 TB for cached volumes
+		Minimize the need to scale up on promise storage while reducing latency for your apps on accessing frequent data
+		
+		Tape Gateway:
+		Used for backup
+		Durable cost effective
+		Virtual tape library
+		You can use already existing tape-based library to store on virtual tape cartridges that you create in the tape gateway
+		You add tape cartridges as you need to archive data
+		
+		Summary:
+		
+		File gateway: for flat files, stored directly on S3
+		
+		Block based storage:
+			Volume gateway: entire data set is stored on site and async backed up to S3
+			Cached volumes: entire data set is stored on S3 and most frequent access data is kept on premises
+		
+		Gateway virtual tape library: used for backup and uses popular backup applications such as Netbackup, backupexec, Veam, etc.
+
+Snowball:
+
+	AWS exports/imports disk accelerates moving large amounts of data in and out of the AWS cloud using portable storage services for transport
+	Instead of uploading from internet use a external disk to accelerate data transfer thru LAN
+	
+	Snowball:
+		Petabyte-scale data transport solution
+		256 encryption
+		once data is transferred is erased.
+		Only Storage
+		
+	Snowball edge:
+		100 TB
+		Compute capabilities and storage
+		can be clustered together to form a local storage tier
+		
+	Snow mobile:
+		Petabyte and exabyte scale data transfer
+		
+		Summary:
+		Import export: you send your own disks and storage
+		Snowball can do:
+			Import to S3
+			Export to S3
+			For glacier restore, move it first to S3 then to Snowball
+			
+S3 Transfer acceleration
+
+	Utilises the cloud front edge network to accelerate uploads to S3
+	Instead uploading directly to the S3 bucket, use a distinct URL to upload to an edge location which will transfer then to S3
+	URL sample
+		acloudguru.s3-accelerate.amazonaws.com
+	
+S3 Summary:
+
+	S3 is object based
+	From 0 bytes to 5TB
+	Files are stored in buckets
+	S3 is an universal namespace, names must be unique globally
+	https://s3-(region).amazonaws.com/(bucketname)
+	Read after write consistency for PUTS of new objects
+	Eventual consistency for overwrite PUTs and DELETEs (needs propagation) (Try to access after deletion you could get an older of the object or even the object)
+	
+	Storage classes:
+		S3 (durable immediately available, frequently accessed)
+		S3 - IA (durable immediately available, non frequently accessed)
+		S3 Reduced Redundancy Storage (data is easily reproducible, afford to lose, not mission critical, lower cost)
+		Glacier - cheapeast, archive, wait 3-5 hours to get the actual data
+	
+	Core fundamentals
+		key (name)
+		Value (data)
+		Version ID
+		Metadata
+		ACL
+	
+	S3 object based storage
+	Not suitable for OS
+	
+	Versioning
+	    Stores all version (You paid each version of the object)
+		Great backup tool
+		Once enabled in bucket, it can be only disabled, to remove it completely need to create another bucket and move the content there.
+		Integrate with life cycle rules
+		MFA delete capabilities for sec
+		Cross region replication, versioning enabled in both origin and dest buckets
+		
+	Life cycle management
+		can be used in conjuction with versioning
+		can be applied to the current and older versions
+		Actions that can be done
+			Transition to S3 IA 
+			> 128kb object size and older than 30 days after creation date
+			Archive to Glacier 30 days after S3 IA
+			Permanent delete objects
+			
+	Cloud front
+		Edge location, separate to AZ/RG
+			Where the content will be cached
+		Origin, origin of all files that CDN will distribute (can be S3 bucket, EC2 instance, Elastic load balancer, Route53)
+		Distribution, name given to the CDN and it is a collection of networks
+			Web distribution, web sites
+			RTMP, video streaming
+		Edge you can read and write will propagate to the origin
+		Objects are cached and held base on the TTL time to live, default 24h, set in seconds
+		You can force clear cache, but will cost
+	
+	Securing buckets
+		By default all newly bucket are private
+		You can setup access control to a bucket by:
+			bucket policies
+			ACL
+		Buckets can be set to create logs of activity for audit reasons, logs can be sent to another bucket
+		
+	Encryption
+		Two types of encryption
+			In transit: SSL/TLS
+			At rest:
+				Server side encryption
+					-S3 managed keys - SS3-S3
+					-AWS Key management service, managed keys - SS3-KMS
+						Allows to have a master key to encrypt all the keys, also enable audit to know how the keys are being used.
+					-Service side encryption with customer provided keys SSE-C 
+					
+			Client side encryption
+				You upload the data encrypted to the S3 bucket.
+	
+	Storage gateway
+		-File gateway, for flat files, stored directly to S3
+		-Volume gateway:	
+				Stored volume: entire dataset is stored on site and backed up async to S3, iSCSI, OS, databases
+				Cached volumes: entire dataset is stored in S3, frequently accessed data is kept on prem
+		-Gateway virtual tape library
+			Used for backups and uses popular backup apps like Netbackup, Backup exec, Veam
+			
+	Snowball
+		Standar snowball
+			Only storage, varios sizes, 5TB original size, 
+		Snowball edge
+			Storage plus compute capabilities
+			run lambdas
+		Snow mobile
+			100Petabytes
+			Only available in the US
+	
+		Import/Export (Old fashion, you ship your storage devices to amazon to import export data)
+		Snowball can import/export to S3
+		
+	S3 Transfer acceleration
+		Costs extra, helps users who are far away from the bucket they are uploading to
+		Uploading files to an s3 edge location, then the objects are replicated to the origin bucket
+		
+	S3 Static websites
+		You can use S3 to host static websites
+		Serveless
+		Scale automatically
+		Static ONLY, no dynamic
+	
+	CORS
+		cross origin resource sharing
+		Need to enable on the resources bucket and state the origin URL that will be accessing them
+		Use the s3 website URL
+		
+	IMPORTANT
+		Be able to recognize the URL from being the bucket URL and the website bucket URL
+		
+		Website URL
+			https://(bucketname).s3-website.(region).amazonaws.com
+		Bucket URL
+			https://s3.(region).amazonaws.com/(bucketname)
+			
+	Lastly
+		When you write to S3 successfully you get a 200 status code
+		Do it faster by enabling multipart upload
+		Read the S3 FAQ!!!
+				
+			
+				
+				
+				
+			
+		
+			
+		
+	
+	
+	
+	
+		
+		
+		
+		
+				
+		
+	
+		
+	
+		
+	
+	
+	
+	
+
+	
+	
