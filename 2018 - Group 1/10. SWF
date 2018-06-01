@@ -1,0 +1,27 @@
+SWF (Simple Workflow Service):
+- Service to coordinate work (tasks) across distributed application components.
+- A tasks represents invocations of various processing steps in an application.
+- Max workflow time is 1 year and always measured in secs.
+- Consider SWF when human interaction involved, and delivery timeframes are longer than 12 hours.
+
+Worker:
+- Program that interact with SWF to get tasks, process received tasks and returns results.
+
+Decider:
+- Program that controls the coordination of tasks (ordering, concurrency, scheduling, according to the app logic).
+
+Workers and Deciders:
+- SWF brokers the interaction between workers and a deciders, allowing the decider to get consistent views into the progress of tasks and to initiate new tasks.
+- SWF stores tasks, assigns them to workers when ready and monitors their progress.
+- A tasks is assigned only once and is never duplicated.
+- Workers and deciders don't have to keep track of execution state.
+
+Domain:
+- Workflow, activity types and the workflow execution are all scoped to a domain.
+- Domains isolate a set of types, executions and task lists.
+- To register a domain use Management Console or RegisterDomain action from the API.
+
+SWF vs SQS:
+- SWF task-oriented API vs SQS message-oriented API.
+- SWF ensures a task is assigned once and never duplicated. SQS needs handling of duplicated messages and handling of messages to be processed only once.
+- SWF keeps track of tasks and events. SQS needs an implementation to for message tracking.
