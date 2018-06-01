@@ -1,0 +1,56 @@
+IAM (Identity Access Management)
+
+https://youtu.be/Ul6FW4UANGc
+
+- Allows you to manage users and their level of access to AWS console.
+- Consists of users, groups and roles.
+- Free
+
+What does it give you?
+- Centralized control of your AWS account.
+- Shared access to AWS account.
+- Granular permission.
+- Identity federation.
+- MFA.
+- Temporary access for users/devices and services.
+- Set up password rotation policy.
+- Integrates with many AWS services.
+- Supports PCI DSS compliance.
+
+Terms:
+- Users: End users (people).
+- Groups: Collection of users under on set of permissions.
+- Roles: You assign them to AWS resources (users or services).
+- Policies: Document that defines one or more permissions.
+- ARN (Amazon Resource Name).
+
+Best practices:
+- Never to login using root account.
+- Always setup MFA on root account.
+- Create user to login: Create group, attach policy (predefined or customized), (policies are written in JSON). Group has users, permissions and access advisor (shows service permissions granted to group and when those services were last accessed).
+- Apply password policy.
+
+Roles
+- Secure way to grant permissions to AWS resources that you trust.
+- Types: Service, cross-account access, identity provider access.
+
+Active Directory Federation:
+- User browses to URL in his domain.
+- Sign-on page authenticates against active directory.
+- Browser receives AuthN (SAML) response.
+- Browser posts (SAML) response to AWS sign-in endpoint (using AssumeRoleWithSAML API to request temporary security credentials and construct sign-in URL for AWS console).
+- Browser receives sign-in URL and redirects to AWS console.
+- Can you authenticate with active directory? Yes, using SAML.
+- Always authenticates against AD first and then get assigned the temporary security credential.
+
+Web Identity Federation:
+- Can you authenticate with Facebook, Google, LinkedIn, Amazon.com, etc? Yes, requires coding.
+- How you authenticate? Login to third-party, get back access token from third-party, obtain temporary security credentials (using AssumenRoleWithWebIdentity API) (will get session token) and then execute an action (using session token).
+
+Tips:
+- Using to authenticate with is SAML (Secure Assertive Markup Language).
+- Authenticate against Identity Provider first.
+- Obtain temporary security credentials (AssumeRoleWithWebIdentity).
+- Able to access AWS resources.
+- Can I change the IAM role on a running EC2 instance? No, you can only change permissions on the IAM role associated with the instance.
+- The AWS sign-in endpoint for SAML is https://signin.aws.amazon.com/saml
