@@ -1,0 +1,28 @@
+Introduction
+
+Exam Blue Print
+
+Objectives:
+- AWS fundamentals (10%)
+- Designing and development (40%)
+- Deployment and security (30%)
+- Debugging (20%)
+
+Technologies:
+- S3
+- DynamoDB
+- SQS
+- SNS
+- SWS
+- Elastic Beanstalk
+- CloudFormation
+
+Exam:
+- 80 minutes
+- 55 multi-choice questions
+- No official passmark (~70% will do well)
+
+Setup:
+- AWS Free Tier account
+- SSH terminal
+- Domain name (optional)
