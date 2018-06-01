@@ -1,3 +1,119 @@
+#S3 PART 1 (Mariana)
+
+S3 (Simple Storage Service)
+- Place to store files on the cloud.
+- Object based (flat files, i.e videos, images, pdfs, documents, not OSs or DBs).
+- Files can be between 0b - 5TB.
+- Organized in buckets (folders).
+- Names must be unique globally (universal namespace).
+- Data spread across multiple devices & facilities (designed to withstand failure).
+- Simple web services interface to store & retrieve data.
+- Secure, durable, highly-scalable (infinite scaling), cheap, unlimited.
+- CDN: https://s3-<region>.amazonaws.com/<bucketName>
+- When uploading, 200 HTTP if success.
+- Largest size file you can transfer to S3 using a PUT operation: 5GB. After that you must use a multipart upload.
+
+* Dropbox leverages on S3 storage.
+
+Data Consistency Model for S3
+- Read after write consistency for PUTs of new objects (when putting object in S3, able to read it right away).
+- Eventual consistency for overwrite PUTs & DELETEs (when updating or deleting, & reading right away, may get the old or new file, because of the propagation time).
+- Updates are atomic (when reading, get the new or the old, but never corrupted).
+
+Core Fundamentals of S3 Object:
+- Key: Name.
+- Value: Data (sequence of bytes).
+- Version ID.
+- Metadata.
+- Subresources: 
+  . ACLs (access control lists), can be added at file level or bucket level, to control fine grained permissions. 
+  . Torrent (s3 supports bitorrent protocol).
+
+* S3 designed to sort object in alphabetical order. In a case with files with similar names, they will be stored in same area & can lead to performance bottlenecks, so consider adding some random letter/number to the beginning of the filename to ensure objects will be stored evenly across S3.
+
+Basics:
+- Built for 99.99% availability, amazon guarantees 99.9% SLA availability & 99.999999999% durability for information (11:9 durability guarantee).
+- Tiered storage available.
+- Lifecycle management.
+- Supports versioning.
+- Supports encryption.
+- Secure your data using ACLs or bucket policies
+
+Storage Tier/Classes:
+- S3(Standard): 99.99% availability & 11:9 durability, for frequently accessed files. Designed to sustain the loss of 2 facilities.
+- S3- IA (Standard - Infrequently Accessed): 99.99% availability & 11:9 durability, for files accessed less frequently but require rapid access. Designed to sustain the loss of 2 facilities. Cheaper than s3 but retrieval fee.
+- Reduced Redundancy Storage: 99.99% availability & 99.99% durability, for data that is easily reproducible. Designed to sustain the loss of 1 facility.
+- Glacier: Very cheap ($0.01 per GB/month), used for archival (3-5 hours to retrieve data). Independent service.
+
+Charges:
+- Storage
+- Requests
+- Storage management pricing (allows to add tags to control cost).
+- Data transfer pricing (moving data around, replication, income is free but moving data not).
+- Transfer acceleration (fast, easy & secure transfers of files between edge locations & an S3 bucket, over an optimized network path).
+
+S3 Bucket Lab:
+- By default, buckets are private & objects stored inside them too.
+- Individual objects inside the bucket don't inherit bucket tags.
+- Buckets can be secured with ACLs or bucket policies.
+- ACLs: Owner, other AWS account, public access. For buckets & files.
+- Encryption:
+  . Client-side
+  . Server side: with Amazon S3 Managed Keys (SSE-S3), with KMS (SSE-KMS), with Customer Provided Keys (SSE-C).
+
+S3 Website Lab:
+- If using Route53 with S3, bucket name must be the same as domain name (i.e for hotmail.com, bucket name has to be hotmail).
+- Static website hosting: http://<bucketName>.s3-website.<region>.amazonaws.com
+- Make html files public.
+- No dynamic content allowed.
+- Scales infinitely.
+- Serverless.
+
+CORS (Cross Origin Resource Sharing) Lab:
+- Way of allowing JS in one S3 bucket to reference code in another S3 bucket.
+- CORS enabling/configuration must be done in the bucket that is being referenced.
+- Update CORS configuration with AllowedOrigin equals to the URL of the s3-website that will reference this code.
+
+Serverless Webpage Lab:
+- When registering domain name, make sure S3 bucket name is available.
+- Serverless is when vendor takes care of provisioning & management of servers, is responsible for capacity provisioning and automated scaling.
+
+* Check S3 FAQ.
+
+Polly:
+- Text-to-speech recognition service.
+- Limited to certain regions (US Virginia for sure).
+- API Gateway: S3 website has different domain name than API gateway. Enable CORS so S3 can communicate with API gateway.
+
+S3 Versioning:
+- User permissions: Objects level and object permissions level.
+- Accounts permissions.
+- Public permissions.
+OK - Cannot remove versioning, only suspend it. To remove version from a bucket, will have to create a new one and transfer object into new bucket.
+- 2 version of on object means 2 objects in the bucket. Storage size will be the sum of size from all versions of one object. Versioning stores all versions of an object (including writes and deletes).
+- When a version is deleted, it cannot be restored.
+- When deleting an object, it can be restored (old console, go to bucket, show versions, delete delete marker).
+- Integrates with lifecycle rules.
+- Versioning's MFA delete capability (uses MFA) can be used to provide additional layer of security.
+
+Cross Region Replication:
+- Versioning must be enabled in both buckets.
+- Regions for each bucket must be different.
+- Only new/updated objects that will be replicated (not existing ones).
+- AWS CLI required to move previous files from one bucket to another. Bare in mind that will only copy objects (not permissions).
+- When updating permissions from an object, permission will be replicated??? Yes.
+- Delete markers are replicated, deletion of a delete marker or deletion of individual version is not.
+- Not possible to replicate to multiple buckets or use daisy chaining.
+
+Lifecycle Management:
+- Based on rules.
+- Can filter by object prefix or tags.
+- Can be used in conjunction with versioning.
+- Can be applied to current versions and previous versions.
+- Actions that can be done: Transition to Standard - IA storage class (128kb minimum and 30 days after creation), archive to Glacier storage class (30 days after Standard - IA).
+- Can be used to permanently delete objects too.
+
+<#S3 PART 2 (Alonso)> -> Aquí Mariana agregó notas de la parte 1 y parte 2, porque no recuerda hasta donde llegaba la parte 1
 
 #S3 PART 3 (Franklin)
 Cloud front.
