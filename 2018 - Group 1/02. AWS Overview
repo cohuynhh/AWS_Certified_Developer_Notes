@@ -1,0 +1,101 @@
+AWS - 10000 Feet Overview
+
+- No long term contracts
+- You pay for what you use
+
+Timeline:
+- 2003: Proposal presented
+- 2004: SQS officially launched
+- 2006: AWS officially launched
+- 2010: amazon.com moved over
+- 2012: First Re-invent conference
+- 2013: First certifications launched
+- 2015: AWS named leader in IaaS Magic Quadrant for 5th year consecutive (Gartner's Magic Quadrant)
+
+Concepts and Components:
+
+AWS Global Infrastructure:
+- 16 regions and 40 availability zones (2016)
+- A region a geographical area. A region consists of 2 or more availability zones (ie. AZ-A, AZ-B, AZ-C).
+- An availability zone (AZ) is a data center.
+- Edge locations are CDN endpoints for CloudFront. Many more edge locations than regions.
+
+Networking:
+- VPC (Virtual Private Cloud): Virtual data center. (Isolated cloud resources).
+- Direct Connect: Way to connect into AWS environment without internet. (Dedicated network connection to AWS).
+- Route53 : Amazon's DNS service (53 is the port that DNS sits on). (Scalable DNS and domain name registration).
+
+Compute:
+- EC2: Most famous service, virtual server. (Virtual Servers in the cloud).
+- ECS (EC2 Container Service): Highly scalable fast container management service that makes it easy to run, stop and manage docker containers on a cluster of EC2 instances (EC2 + docker). (Run and manage docker containers).
+- Elastic Beanstalk: Easy-to-use service for deploying and scaling web applications and services. (Run and manage web apps).
+- Lambda: Allows you to run code serverless. You pay for compute-time only. (Run code in response to events).
+
+Storage:
+- S3: Place to store files (object-based). You pay for storage you use. (Scalable storage in the cloud).
+- Cloud Front: Amazon's CDN service. (Global content delivery network).
+- Glacier: Secure, durable and low cost storage solution for data archiving and long term backup (offline storage). (Archive storage in the cloud).
+- EFS (Elastic Files System): NES in the cloud. (Fully managed file system for EC2).
+- Snowball: Import/export service. Pay for on daily basis. (?).
+- Storage Gateway: Service connecting VM to cloud based storage.
+
+Databases:
+- RDS (Relational Database Service: Different database services. (Managed relational database service).
+- DynamoDB: NoSQL database service. (Managed noSQL database).
+- Elasticache: Way of caching database services in the cloud. (In-memory cache).
+- Redshift: Amazon's data warehousing service. (Fast, simple, cost-effective data warehousing).
+- DMS (Database Migration Service): Way of migrating databases into AWS. (Managed database migration service).
+
+Analytics
+- EMR (Elastic Map Reduce): Way of processing big data. (Managed hadoop framework).
+- Data Pipeline: Moving data from one area to another. (Orchestration for data-driven workflows).
+- Elastic Search: Managed service that makes it easy to deploy, operate and scale Elastic Search in AWS. (Run and scale Elasticsearch clusters).
+- Kinesis: Platform for streaming data in AWS. (Work with real-time streaming data).
+- Machine Learning: Service that makes it easy for developers to use machine learning. (Build smart applications quickly and easily).
+- Quick Sight: Business intelligence service. (?).
+
+Security and Identity:
+- IAM (Identity Access Management): Where you can manage users, groups, roles, etc. (Manager user access and encryption keys).
+- Directory Services: Multiple types of directory services. (Host and mange active directory).
+- Inspector: Allows to install agents to ECS instances and inspect them for security vulnerabilities. (Analyze application security).
+- WAF (Web Application Firewall): ?. (Filter malicious web traffic).
+- Cloud HSM (Hardware Security Module): Way of securing your cloud based infrastructure. (?).
+- KMS (Key Management Service): ?. (?).
+
+Management Tools:
+- CloudWatch: ?. (Monitor resource and applications).
+- CloudFormation: ?. (Create and manages resource with templates).
+- CloudTrail: Way of providing audit access to what people is doing in the AWS platform. (Track user activity and API usage).
+- Opsworks: Configuration management service. (Automate operations with Chef).
+- Config: Service that provides AWS resource inventory, configuration history and configuration change notifications. Allows you to create config rules. (Track resource inventory and changes).
+-  Service Catalog: Allows to create and manage catalogs of IT services. (Create and use standardized products).
+- Trusted Advisor: Automated service that scans your environment. (Optimize performance and security).
+
+Application Services
+- API Gateway: Create, publish, maintain, monitor and secure APIs. (Build, deploy and manage APIs).
+- AppStream: Allows you to stream your existing Windows applications from the cloud. (Low latency application streaming).
+- CloudSearch: Managed service that makes it simple and cost-effective to setup, manage and scale a search solution for your website or application. (Managed search service).
+- Elastic Transcoder: Media transcoding service in the cloud. (Easy-to-use scalable media transcoding).
+- SES (Simple Email Service): Email service. (Email sending and receiving service).
+- SQS (Simple Queue Service): Way of decoupling your infrastructure. (Message queue service).
+- SWF (Simple Workflow Service): Helps develop, build, run and scale background jobs that have parallel or sequential steps. (Workflow service for coordinating application components).
+
+Developer Tools
+- CodeCommit: Source control service (AWS version of github). (Store code in private git repositories).
+- CodeDeploy: Automates code deploy to any instance. (Automate code deployments).
+- CodePipeline: Continuous delivery service. (Release software using continuous delivery).
+
+Mobile Services:
+- Mobile Hub: Way of building, testing and monitoring the usage of mobile apps. (Build, test and monitor mobile apps).
+- Cognito: Allows you to save your mobile usage data. (User identity and app data synchronization).
+- Device Farm: Enables you to test you mobile apps against multiple devices. (Test mobile apps on real devices in the cloud).
+- Mobile Analytics: Measure app usage, revenue, tracking, etc. (Collect, view and export app analytics).
+- SNS (Simple Notification Service): Web service to setup and send notifications. (Push notification service).
+
+Enterprise Applications:
+- WorkSpaces: Amazon's version of VDI. (Desktops in the cloud).
+- WorkDocs: Storage and sharing service. Like dropbox. (Secure enterprise storage and sharing service).
+- WorkMail: Amazon's exchange version. (Secure email and calendaring service).
+
+IoT (Internet of Things):
+- Platform that enables you to connect devices to AWS services and other devices. (Connect devices to the cloud).
