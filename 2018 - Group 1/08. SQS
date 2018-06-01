@@ -1,0 +1,32 @@
+SQS (Simple Queue Service):
+- First AWS service launched.
+- Distributed queue system.
+- To queue/store messages that one component generates while awaiting to be processed by another.
+- Used to decouple components of an application.
+- Messages can contain up tp 256kb of text in any format.
+- Engineered to provide "at least once" delivery of each message.
+- Multiple readers and writers can interact with the same queue.
+- A single queue can be used simultaneously by multiple components.
+- Does not guarantees FIFO delivery of messages.
+  . If your system requires order to be preserved, place sequencing info in each message, to reorder the messages when the queue returns them.
+- SQS always polls messages (never pushes them out).
+- Visibility timeout period of a message starts when the the consumer component has picked up the message from the queue.
+- Message has to be deleted during the visibility timeout period to be considered as completed
+  . If not, another consumer may assume that message was not finished processing and will pull it again and try to process it.
+- Can do autoscaling.
+
+Pricing:
+- First 1 million of requests per month is free.
+- $0.50 per million requests per month thereafter ($0.00000050 per request).
+- A request can have from 1 to 10 messages, up to a max payload of 256kb.
+- Billed at 64kb chunks. Each 64kb chunk of payload is billed as 1 request (a single API call with 256kb payload will be billed as 4 requests).
+
+Exam Tips:
+- Messages can be delivered multiple times and in any order.
+- Default visibility timeout is 30 secs. Max timeout is 12 hours.
+  . If visibility timeout is insufficient to process and delete the message, use ChangeMessageVisibility action to specify new timeout.
+- Short polling (standard): Returns immediately, even if the queue is empty.
+- Long polling: Doesn't return until a message arrives or long poll times out.
+  . Use when required to retrieve messages as soon as available in the queue. Max long poll time out is 20 secs.
+  . Polling in at tight loops is burning CPU cycles and costing the company money. How to fix this? Enable long polling.
+- Fanning out: Create SNS topic and subscribe multiple SQS queues to that topic. Whenever a message is sent to the topic, SNS will deliver the message to all queues that are subscribed.
