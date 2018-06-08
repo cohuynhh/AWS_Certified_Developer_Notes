@@ -1,0 +1,169 @@
+AWS Databases
+
+(Currently 5)
+-RDS (Relational Database System)
+-DynamoDB
+-ElastiCache
+-Amazon Redshift
+-Database Migration System
+
+
+RDS: not much in the exam
+	-SQL Server
+	-Oracle
+	-MySQL
+	-PostgreSQL
+	-Aurora
+	-MariaDB 
+
+Non RDB
+	- Document
+	- JSON
+
+Data Warehousing
+	- Used for business intelligence
+	- Used to pull in very large and complex datasets
+
+Data Warehousing vs RDS
+	-Online Transaction Processing vs Online Analytics Processing:
+		OLTP: Differs from OLAP in the types of queries run. Pulls row data
+		OLAP: Analyze a large volume of information. Gathers patterns and shows tendencies. Pulls in large number of records.
+	-Datawarehousing: Use different type of architecture both from a database and infrastructure layer. In order to maximize query times.
+
+Elasticache
+	Makes easier to deploy, operate and scale in-memory cache in the cloud
+	Increases performance by allowing the retrieve from a memory caches which are faster than slow disk based databases.
+	Supports:
+		- Memcached
+		- Redis
+	Will cache the most consistent queried aspects of a DB
+
+DMS 
+	Allows to migrate production databases into AWS. Once it is started it is managed by AWS, aspects like: compression, transformation and parallel transfer.
+	Data changes to the source are replicated on the target. That is new data will also be migrated
+	Aws conversion Tool:
+		- Converts Schemas, views, stored proc, functions to a format compatible with the target database.
+
+
+DYNAMO DB 101: AmazonNoSQL Database
+	-Fast and Flexible
+	-NoSQL
+	-Single Digit millisecond latency at any scale 0-9
+	-Supports both Document and Key-Value data models
+	-Stored on SSD storage(fast)
+	-Spread 3 geographically distinct datacenters
+	-Uses replication between 3
+		-Eventual Consistent reads
+			- Copies consistency is reached within a second
+			- Best read performance
+		-Strongly consistent reads
+			- returns a result that reflects all writes that received a successful read. ? Difference between SCR vs ECR
+	- Tables, Items(rows), Attributes(columns)
+	- Supports 35 different nests
+	- Pricing:
+		- Provisioned Throughput Capacity: 0.0065$ per hour for every 10 units(write) and 50 units(read) ? - 
+			-Write Capacity Unit can handle 1 write per second. So 11.5 writes would need 12 
+		- Storage: First 25GB per month is free. Then 0.25$ per GB per month
+
+Creating a Table:
+	- Assigns role to EC2 to call DynamoDB
+
+Dynamo DB Indexes
+
+Two Types of Primary Keys: 
+	-Single Attribute: Partition Key, 1 attr, unique
+		-Uses the partition in a hash function to find the physical disk where the data is stored.
+	-Composite: 2 attr, partition key and sort key, items partition is not unique but their sort must be different.
+		-Items with the same partition are stored together and ordered by sort key
+		-Uses the partition in a hash function to find the physical disk where the data is stored.		
+
+
+	? Is there a precedence on different sortKeys?		
+
+Indexes
+	Local Secondary Indexes: Same partition key but diff sort key.
+		-Can only be created when creating the table
+		-Cannot be modified/removed
+		-Max 5 indexes on the same table
+	Global Secondary Indexes: Diff partition key and diff sort key
+		-Can be created when creating the table or later
+		-Max 5 indexes on the same table
+
+DynamoDB Streams: Not the trigger but rather the snapshots of the item that was modified.
+
+	Used to capture modifications to the tables
+		-On item add captures an image of the item including attr
+		-On item update captures before and after image of attr that changed
+		-On item delete captures an image of the item
+	Stored maximum of 24h
+	Can trigger lambdas
+	Lab:
+		Streams creation
+			-Keys Only: only the key attr of the modified item
+			-New image: the entire item after it was modified
+			-old image: the entire item before it was modified
+			-New and old: both after and before entire images
+Tables 
+	-Can be exported to csv
+
+
+Query vs scans
+	Query: finds items only using table primary key values. 
+		-Parition key name and a distinct value to search for. 
+		-Can use sort key name and value and refine search results with a comparison operator.
+		-returns all attributes by default
+		-can use projectionExpression to selectively choose attributes
+		-Always sorted by sort key
+		-Returned in ASC order to reverse ScanIndexForward to false
+		-More efficient than scan
+	Scan: examines all items in the table
+		-Returns all attribute 
+		-can use projectionExpression to selectively choose attributes
+		-Scans all then filters
+		-Careful: Can use all provisioned throughput(units) in a single operation
+		-Slower on large tables
+ 
+DynamoDB & Provisioned Throughput
+	Exam: Given an scenario calculate read/write throughput
+	-Read unit:	
+		-Rounded up to increments of 4KB
+		-Eventually consistent reads, consist of 2 reads per second
+		-Strongly consistent reads, consis of 1 read per second
+		-(round_to_nearest_4k_chunk/4KB) * items_per_second= read throughput (divide by 2 if eventually consistent only)
+		-round units up to an integer
+	-Write unit:
+		-1 KB write
+		-1 write per second
+		-(size*items_per_second)= write 
+	-On exceeding throughput 400 ProvisionedThroughputExceededException
+
+WebIdentity with DynamoDB
+	-Authenticates with ID provider
+	-They are given a Token by their ID provider
+	-My app calls AssumeRoleWithWebIdentity which provides the providers token and ARN for the IAM Role
+	-Can Access DynamoDB for 15m to 1 hour(default)
+	-Go to Table->access control, Generate Policy, Create role granting identity provider access for an app, create policy, attach policy 
+
+Other aspects
+	Conditional Writes:
+		- Two updates happening one after the other. Conditional writes makes the update if a condition is met. e.g. item is $10, 1 user updates to $15 only if $10, 2 user update to $6 only if $10. 
+		- Idempotent, only happens once
+		- Used when a margin error is not allowed
+	Atomic counters:
+		-Use of UpdateItem to increment/decrement value of an attribute without interfering with other write requests. Write requests are applied in the  order they are received.
+		-Are not idempotent
+		-On failure can be executed again, risk of updating it twice
+		-Used when a margin of error is allowed
+	Batch Operations
+		-Read multiple items -> BatchGetItem 
+		-Limit 1: Can retrieve up to 1 MB of data
+		-Limit 2: Max of 100 items
+		-Multiple items from multiple tables
+
+Summary:
+	-Fully managed = Can't ssh to it
+
+Using the AWS portal, you are trying to Scale DynamoDB past its preconfigured maximums. Which service can you increase by raising a ticket to AWS support?
+
+
+Note: READ FAQS!!!
