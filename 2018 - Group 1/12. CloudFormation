@@ -1,0 +1,26 @@
+Cloud Formation
+- Gives users an easy way to create and manage a collection of related AWS resources, provisioning and updating them in an orderly and predictable fashion.
+- Template: Architectural diagram. JSON or YAML format.
+- Stack: End result of that diagram (what is actually provisioned).
+- Create, update, delete collection of resources by creating, updating and deleting stacks using CF templates.
+- Use when trying to turn infrastructure into code and provision stacks across multiple regions.
+- More powerful and customizable than EB.
+
+Template Elements:
+- Mandatory:
+  . List of AWS resources and their associated configuration values.
+- Optional:
+  . Template's file format and version number.
+  . Template parameters: Input values supplied at stack creation time (limit of 60).
+  . Output values: Output values required once stack has finished building (limit of 60).
+  . List of data tables: Used to look up static configuration values (such as AMI's. etc).
+
+Exam Tips:
+- Be default, automatic rollback on error feature is enabled.
+- Your are charged for errors.
+- You pay for the resources that you use, but CF is free.
+- Stacks can wait for apps to be provisioned using the WaitCondition.
+- You can wait use Fn:GetAtt to output data.
+- Route53 is completely supported (includes creating new hosted zones or updating).
+- You can create A Records, Aliases, etc.
+- IAM Role Creation and Assignment is supported.
