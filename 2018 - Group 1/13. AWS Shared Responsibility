@@ -1,0 +1,44 @@
+Shared Responsibility Model
+
+Infrastructure Services:
+- EC2, EBS, VPC.
+- AWS responsibility:
+  . AWS endpoints.
+  . AWS global infrastructure (regions, AZs, edge locations).
+  . Foundation services (compute, storage, databases, networking)
+- Customer responsibility:
+  . Client-side data encryption and data integrity authentication.
+  . Server-side encryption.
+  . Network traffic protection.
+  . OS, network and firewall configuration.
+  . Platform and application management.
+  . Customer data.
+
+Container Services:
+- RDS, EMR.
+- AWS responsibility:
+  . AWS endpoints.
+  . AWS global infrastructure.
+  . Foundation services.
+  . OS and network configuration.
+  . Platform and application management.
+- Customer responsibility:
+  . Client-side data encryption and data integrity authentication.
+  . Network traffic protection.
+  . Firewall configuration.
+  . Customer data.
+
+Abstracted Services:
+- S3, DynamoDB, Lambda.
+- AWS responsibility:
+  . AWS endpoints.
+  . AWS global infrastructure.
+  . Foundation services.
+  . OS, network and firewall configuration.
+  . Platform and application management.
+  . Network traffic protection provided by the platform.
+  . Server side encryption provided by the platform.
+- Customer responsibility:
+  . Client-side data encryption and data integrity authentication.
+  . Customer data.
+  
