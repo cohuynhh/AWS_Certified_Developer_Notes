@@ -1,0 +1,989 @@
+IAM (Identity Access Management):
+- Manages users & their level of access to AWS console.
+- Users, groups & roles.
+- Centralized control of your AWS account.
+- Shared access to AWS account.
+- Granular permission.
+- Identity federation.
+- MFA.
+- Temporary access for users, devices & services.
+- Password rotation policy.
+- Supports PCI DSS compliance.
+- Has no region.
+- New users have no permissions.
+
+Pricing:
+- Free.
+
+Terms:
+- Users: People.
+- Groups: Collection of users under a set of permissions.
+- Roles: Assignable to users, services or resources.
+- Policies: Doc that defines 1 or more permissions.
+- ARN (Amazon Resource Name).
+
+Best Practices:
+- Never login using root account.
+- Always setup MFA on root account.
+- Create user to login.
+- Apply password policy.
+
+Roles:
+- Secure way to grant permissions to AWS resources you trust.
+- Types:
+	- Service.
+	- Cross account access.
+	- Identity provider access.
+
+STS (Security Token Service):
+- Sources:
+	- Federation (AD).
+	- Mobile apps (OpenID, Google, FB).
+	- AWS from other services.
+- Federation: Combining & joining list of users from 1 service to another.
+- Identity broker: Take an identity from point A to point B, coding required.
+- Identity store: Services like AD, FB, Google.
+- Identity: User of a service.
+
+Active Directory Federation:
+- User browses to URL in his domain.
+- Sign-on page auths against active directory.
+- Browser receives AuthN (SAML) response.
+- Browser posts (SAML) response to AWS sign-in endpoint (using AssumeRoleWithSAML API to request temporary security credentials & construct sign-in URL for AWS console).
+- Browser receives sign-in URL & redirects to AWS console.
+- Always auths against AD 1st & then get assigned the temporary security credential.
+- AWS sign-in endpoint for SAML: https://signin.aws.amazon.com/saml.
+
+Web Identity Federation:
+- Login to third-party.
+- Get back access token from third-party.
+- Obtain temporary security credentials (using AssumenRoleWithWebIdentity API, will get session token).
+- Execute an action (using session token).
+
+--------------------------------------------------
+EC2 (Elastic Cloud Computing):
+- VMs in the cloud.
+- Provisioned on demand.
+- Pay only for capacity actually used.
+
+Pricing:
+- On demand:
+	- Most common, paid by the h (or sec). 
+	- Use case: Low cost & flexibility without up-front payment or long-term commitment, short-term apps, unpredictable workloads, developed or tested on EC2 for the 1st time.
+- Reserved:
+	- Provide capacity reservation.
+	- Type: Standard, convertible, scheduled.
+	- Use case: Able to make up-front payment, apps with steady state, predictable usage, requiere reserved capacity.
+- Spot:
+	- Bid price for instance capacity.
+	- If you terminate the instance you pay the whole h, if AWS terminates the instance, you get the h for free.
+	- Use case: Urgent computing needs for large amounts of capacity, apps with flexible start & end times, very low compute prices.
+- Dedicated hosts:
+	- Physical EC2 server for dedicated use.
+	- Use case: Purchase on demand or reservation, apps with regulatory requirements that don't support multi-tenant virtualization, licensing.
+
+Instance Types (DR MC GIFT PX):
+- D2:
+	- D for density. Dense storage.
+	- Use case: File servers, data warehousing, Hadoop.
+- R4:
+	- R for RAM. Memory optimized.
+	- Use case: Memory intensive apps, DBs.
+- M4:
+	- M for main choice. General purpose, default.
+	- Use case: App servers.
+- C4:
+	- C for compute. Compute optimized.
+	- Use case: CPU intensive apps, DBs.
+- G2:
+	- G for graphics. Graphics intensive.
+	- Use case: Video encoding, 3D app streaming.
+- I2:
+	- I for IOPS. High speed storage.
+	- Use case: NoSQL DBs, data warehousing.
+- F1:
+	- F for FPGA. Field programmable gate array.
+	- Use case: Hardware acceleration.
+- T2:
+	- Micros. General purpose at a lowest cost.
+	- Use case: Web servers, small DBs.
+- P2:
+	- P for pictures & graphics. Graphics, general purpose GPU.
+	- Use case: Machine learning, bit coin mining.
+- X1:
+	- X for extreme RAM. Memory optimized.
+	- Use case: SAP HANA, Apache Spark.
+
+EBS (Elastic Block Storage):
+- Storage volumes for EC2 instances.
+- Placed in specific AZ (same as the EC2 instance). To move through AZs, create snapshot of the target volume, then when about to restore, will have the option to move it.
+- Termination protection is turned off by default, you must turn it on.
+- On an EBS backed instance, default action is for the root EBS volume to be deleted once the instance is terminated.
+- EBS root volumes of default AMIs cannot be encrypted by default. Can use third party tool or by creating a copy of the AMI & when creating the copy, encrypt root volume. Additional volumes can be encrypted.
+- EBS backed instances can be stopped. You will not lose the data.
+- Cannot mount 1 EBS to multiple EC2 instances, instead use EFS.
+- Types:
+	- GP2: 
+		- SSD general purpose. Most used.
+		- IOPS <= 10000.
+		- Use case: Balance price & performance.
+	- IO1:
+		- SSD provisioned IOPS.
+		- 10000 < IOPS <= 20000.
+		- Use case: I/O intensive apps (relational or noSQL DBs).
+	- ST1:
+		- HDD throughput optimized. Cannot be boot volume.
+		- Use case: Big data, data warehousing, log processing.
+	- SC1:
+		- HDD cold. Cannot be boot volume.
+		- Use case: Low cost storage for infrequently accessed workloads, file servers.
+	- Magnetic standard:
+		- HDD, bootable, lowest cost.
+		- Use case: Infrequently accessed workloads where low cost is important.
+- AttachVolume API call to attach an EBS volume to a running or stopped instance.
+
+Snapshots:
+- Point in time of a volume, stored in S3.
+- Are incremental, only blocks that changed are moved to S3.
+- Snapshots of encrypted volumes are encrypted automatically. Volumes restored from encrypted snapshots are encrypted automatically.
+- Snapshots can be shared (between AWS account or made public) only if unencrypted.
+- To create a snapshot for EBS root volume, it's recommend to stop the instance before (but not obligatory).
+- AMIs can be created from volumes & snapshots.
+
+Instance Store Volumes:
+- Ephemeral storage. Data in instance store is not permanent, it only persists during the lifetime of the instance.
+- Data will be lost if instance is terminate or stop/start.
+
+AMI (Amazon Machine Images):
+- AMIs are regional, can only launch an AMI from the regions it's stored.
+- AMIs can be shared with specific AWS accounts.
+- Can copy AMIs to other regions using the console, command line or Amazon EC2 API.
+- Size limit for root device: 
+	- EBS-backed AMI: 16 TiB.
+	- Instance store-backed AMI: 10 GiB.
+- RegisterImage API call on the final process of creating an AMI.
+- DescribeImages API call to describe one or more AMIs available to you.
+- BundleInstance API call to bundle a store-backed Windows instance.
+
+CloudWatch:
+- Standard monitoring: 5 mins.
+- Detailed monitoring: 1 min, extra cost.
+- CloudWatch is for performance monitoring, CloudTrail is for auditing.
+- Can create dashboards to visualize what's happening on AWS environment.
+- Alarms to notify about particular thresholds.
+- Events to respond to state changes in AWS resources.
+- Logs to aggregate, monitor & store logs.
+
+Roles:
+- Most secure that storing access & secret keys on individual EC2 instances.
+- Can be assigned to an EC2 instance after it has been provisioned using AWS console or command line.
+- Rules are universal, can use them in any region.
+
+EFS (Elastic File System):
+- File storage service for EC2 instances.
+- Capacity is elastic.
+- EC2 instances must be in the same SG as EFs volume.
+- Supports NFSv4.
+- Pay for storage used.
+- Scalable up to petabytes.
+- Supports thousands of concurrent NFS connections.
+- Data stored across multiple Azs within a region.
+- Block based storage.
+- Read-after-write consistency.
+- Same EFS can be mounted in 2 different instances.
+
+AWS CLI:
+- aws s3 help (aws is the command, s3 is the service & help is the action).
+- Before running it, have to register access & secret keys.
+- When using roles, don't have to register keys.
+- Commands:
+	- aws ec2 describe-images (show all images available to provision).
+	- aws ec2 describe-instances (show all instances we currently have).
+	- aws ec2 run-instances (create a new instance).
+	- aws ec2 start-instances (start stopped instances).
+	- aws ec2 terminate-instances (terminate instances).
+
+Instance Metadata:
+- Get specific details about our EC2 instance: $curl http://169.254.169.254/latest/meta-data
+- Get public IP of our EC2 instance: $curl http://169.254.169.254/latest/meta-data/public-ipv4
+	
+ELB (Elastic Load Balancers):
+- Virtual appliance that's going to spread the load of your traffic across available web servers.
+- Instances monitored by ELBs are reported as InService or OutOfService. Once an instance is OutOfService, the ELB will not send traffic to it.
+- Healthcheck checks the instance health by pining it.
+- ELBs have their own DNS name, never use IP address since it can change.
+- ELBs will cost you money if you leave them on.
+- Types:
+	- App:
+		- Routing decision at HTPP/HTTPS layer.
+		- Supported protocols: HTTP, HTTPS, HTTP/2, WebSockets.
+	- Classic:
+		- Decisions are either at TCP/SSL layer or HTTP/HTTPS layer.
+		- Supported protocols: HTTP, HTTPS, TCP, SSL.
+- Available SDKs: Android, iOS & JavaScript (browser). Java, .NET, NodeJS, PHP, Python, Ruby, Go, C++, AWS Mobile SDK, AWS IoT Device SDK.
+- Default region is us-east-1. Some have default regions (Java), some don't (NodeJS).
+- Best method for maintaining app session state when using ELB is ElastiCache.
+- Default setting of connection draining in ELBs is 300 secs.
+
+Lambda:
+- Serverless, only worry about your code.
+- Service to upload & create a lambda function. Takes care of provisioning & managing servers to run the code.
+- Cheap.
+- Continuos scaling, sales out (not up) automatically.
+- Function are independent (1 event = 1 function).
+- Other serverless services: S3, API Gateway, DynamoDB.
+- Lambda functions can trigger other lambda functions (1 event = n functions if functions trigger other functions).
+- AWS X-Ray allows to debug complicated architectures.
+- Limit of /tmp for a function is 512 MB.
+- Max lambda threshold is 5 mins. If execution may take longer, need to break your function.
+- Use cases:
+	- Event-driven compute service where AWS lambda runs your code in respond to events.
+	- Compute service to run your code in response to HTTP requests using API Gateway or API calls made using AWS SDKs.
+- Triggers: API Gateway, AWS IoT, Alexa Skills Kit, Alexa Smart Home, CloudFront, CloudWatch events, CloudWatch logs.
+- Languages supported: NodeJS, Java, Python, C#, Ruby.
+
+Pricing:
+- P/ number of requests: 1st million are free, $0.20 p/ million requests thereafter.
+- Duration:
+	- Calculated from the time your code begins executing until it returns or otherwise terminates, rounded up to the nearest 100ms.
+	- Price dependes on the amount of memory you allocate to your function, charged $0.00001667 for every GB p/ sec used.
+
+--------------------------------------------------
+S3 (Simple Storage Sevrice):
+- Store files on the cloud.
+- Object based.
+- Serverless.
+- File can be between 0b & 5TB.
+- Organized in buckets (folders).
+- Data is spread across multiple devices & facilities, to withstand failure.
+- Secure.
+- Scales infinitely (volume of data & number of objects is unlimited).
+- Cheap.
+- Unlimited storage.
+- Built for 99.99% availability, amazon guarantees 99.9% SLA availability & 99.999999999% durability for information (11:9 durability guarantee).
+- Tiered storage available.
+- Lifecycle management.
+- Supports versioning.
+- Supports encryption.
+- Largest size file you can upload with PUT is 5GB. After that you must use a multipart upload. Multipart allows to stop & resume uploads.
+- Read-after-write consistency for PUT of new objects & eventual consistency for overwrite PUT & DELETE.
+
+Buckets:
+- Up to 100 buckets p/ account.
+- Individual objects inside the bucket don't inherit bucket tags.
+- Bucket URL: https://s3-<region>.amazonaws.com/<bucketName>.
+- Naming convention:
+	- Names must be unique across all existing bucket names in Amazon S3 (406 HTTP error BUcketAlreadyExists if not).
+	- Must comply with DNS naming conventions.
+	- Must be at least 3 & no more than 63 chars long.
+	- Must not contain uppercase chars or underscores. Can contain lowercase letters, numbers & hyphens.
+	- Must start with a lowercase letter or number.
+	- Must be a series of 1 or more labels. Adjacent labels are separated by a single period. Each label must start & end with a lowercase letter or a number.
+	- Must not be formatted as an IP address.
+	- When you use virtual hosted–style buckets with SSL, the SSL wildcard certificate only matches buckets that don't contain periods. To work around this, use HTTP or write your own certificate verification logic. Recommendation is to not use periods in bucket names when using virtual hosted–style buckets.
+- S3 object key names are stored in alphabetical order.
+- To introduce randomness to key names, add a hash string as prefix to the key name (bucket/8761-2010-26-05-15-00-00/myfolder<hash prefix>/photo1.jpg).
+
+Object Attributes:
+- Key: Name.
+- Value: Data (sequence of bytes).
+- Version ID.
+- Metadata.
+- Subresources: 
+	- ACLs, can be added at file level or bucket level. 
+	- Torrent (s3 supports bitorrent protocol).
+
+Storage Classes:
+- S3 (Standard):
+	- 99.99% availability & 11:9 durability. 
+	- Designed to sustain the loss of 2 facilities.	
+	- Use case: For frequently accessed files.
+- S3-IA (Standard - Infrequently Accessed):
+	- 99.99% availability & 11:9 durability.
+	- Designed to sustain the loss of 2 facilities. Cheaper than s3 but retrieval fee.
+	- Use case: For files accessed less frequently but require rapid access.
+- Reduced Redundancy Storage:
+	- 99.99% availability & 99.99% durability
+	- Designed to sustain the loss of 1 facility.
+	- Use case: For data that is easily reproducible.
+- Glacier:
+	- Very cheap, $0.01 p/ GB p/ month.
+	- Independent service.
+	- Use case: For archival (3-5 hs to retrieve data).
+- Header x-amz-storage-class to specify storage class the object will be put in.
+
+Pricing:
+- For storage.
+- For requests.
+- For storage management pricing (allows to add tags to control cost).
+- For data transfer pricing (moving data around, replication, income is free but moving data not).
+- Transfer acceleration (fast, easy & secure transfers of files between edge locations & an S3 bucket, over an optimized network path).
+
+Versioning:
+- Stores all versions of an object (including writes & even if you delete an object).
+- Great backup tool.
+- Once enabled, versioning cannot be disabled, only suspended.
+- 2 versions of on object means 2 objects in the bucket.
+- Any objects uploaded prior to versioning will have the version ID as null.
+- When a version is deleted, it cannot be restored. When deleting an object, it can be restored
+- Integrates with lifecycle rules.
+- Versioning MFA delete capability can be used to provide additional layer security.
+
+S3 Website:
+- If using Route53 with S3, bucket name must be the same as domain name (for hotmail.com, bucket name has to be hotmail).
+- When registering domain name, make sure S3 bucket name is available.
+- Static website hosting URL: http://<bucketName>.s3-website.<region>.amazonaws.com
+- HTML files must be public.
+- No dynamic content allowed.
+
+CORS (Cross Origin Resource Sharing):
+- Way of allowing JS in 1 S3 bucket to ref code in another S3 bucket.
+- CORS enabling & config must be done in the bucket that is being ref.
+- Update CORS config with AllowedOrigin equals to the URL of the s3-website that will ref this code.
+- Versioning must be enabled on both buckets (source & destination).
+- Regions for each bucket must be different.
+- Only new & updated objects will be replicated (not existing ones).
+- Delete markers are replicated, deletion of a delete marker or deletion of individual version is not.
+- Not possible to replicate to multiple buckets or use daisy chaining.
+
+Lifecycle Management:
+- Based on rules.
+- Can filter by object prefix or tags.
+- Can be used in conjunction with versioning.
+- Can be applied to current versions & previous versions.
+- Actions that can be done:
+	- Transition to S3-IA storage: 128kb min & 30 days after creation.
+	- Archive to Glacier storage: 30 days after S3-IA.
+	- Permanently delete objects.
+
+Security & Encryption:
+- By default, buckets are private & objects stored inside too.
+- Bucket ownership is not transferable.
+- Features to setup access control in a bucket:
+	- Bucket policies. A policy contains elements: Resources, Actions, Effect & Principal.
+	- ACLs.
+- S3 buckets can be configured to create access logs.
+- A bucket can have both encrypted & non-encrypted objects.
+- Types of encryption:
+	- In transit: SSL/TLS.
+	- At rest:
+		- Server side encryption:
+			- SSE-S3: S3 managed key. Each object is encrypted with a unique key employing strong MFA encryption. Additionally, it encrypts the key itself with a master key that regularly rotates.
+			- SSE-KMS: Key management service. Separate permissions for the use of an envelop key that provides added protection against unauthorized access of your objects in S3 & also provides an audit trail of when your key was used & by whom.
+			- SSE-C: Customer provided keys. You manage the encryption keys & Amazon S3 manages the encryption, as it writes to disks & decryption, when you access your objects.
+		- Client side encryption.
+- AES-256 encryption (advanced encryption standard).
+- Header x-amz-server-side-encryption, when specified in API call, will cause the object to be SSE encrypted.
+
+CloudFront:
+- CDN (Content Delivery Network).
+- Distributed servers that deliver content to a user based on geographic locations of the user, the origin of the content & a content delivery server.
+- To establish TTL (time to live), take into consideration how often will your files change.
+- Min TTL is 0 secs, max TTL is 365 days & default TTL is 24 hs.
+
+Terms:
+- Edge location: Location where the content will be cached (different to a region or AZ). You can read & write to them.
+- Origin: Origin of files that the CDN will distribute. Can be S3 bucket, EC2 instance, ELB or Route53.
+- Distribution: Name given to the CDN which consists of a collection of edge locations. Distributions allow to create whitelists & blacklists. Distributions allow to create invalidations (remove objects from edge location). Types:
+	- Web: Used for websites.
+	- RTMP: Used for media streaming.
+
+Storage Gateway:
+- Service that connects an on-premises software appliance with cloud-based storage to provide seamless & secure integration between an organization's on-premises IT environment & AWS's storage infrastructure.
+- Storage Gateway software appliance is available for download as a VM image that you install on a host in your datacenter.
+- Types:
+	- File gateway (NFS): For storing flat files, stored directly on S3.
+	- Volume gateway (iSCSI): Block-based storage on virtual hard disk. Can be backed-up as snapshots.
+		- Stored volumes: Entire dataset is stored on site & is asynchronously backed up to S3.
+		- Cached volumes: Entire dataset is stored on S3 & the most frequently accessed data is cached on site.
+		- Tape gateway (VTL): Used for backup & uses popular backup apps.
+
+Snowball:
+- Portable storage services for transport, instead of uploading from internet.
+- Can import to S3, export from S3.
+- If using Glacier, will have to restore to S3 & then move it to the Snowball appliance.
+- Types:
+	- Snowball:
+		- Petabyte-scale data transport solution.
+		- 256 encryption.
+		- Once data is transferred, it's erased.
+		- 80TH data transfer.
+	- Snowball Edge:
+		- On-board storage & compute capabilities.
+		- Can be clustered together to form a local storage tier.
+		- 100TB data transfer.
+
+	- Snowmobile:
+		- Exabyte-scale data transfer.
+		- Up to 100PB data transfer.
+
+S3 Transfer Acceleration:
+- Utilizes the CloudFront edge network to accelerate your uploads to S3.
+- Instead of uploading directly to your S3 bucket, you can use a distinct URL to upload directly to an edge location which will then transfer that file to S3.
+- URL to upload to: <bucket-name>.s3-accelerate.amazonaws.com.
+
+--------------------------------------------------
+DB Services:
+- RDS (Relational DB Service):
+	- OLTP (Online Transaction Processing).
+	- DB -> Tables -> Rows -> Fields (columns).
+	- SQLServer, Oracle, MySQL,PostgreSQL, Aurora, MariaDB.
+- DynamoDB:
+	- NoSQL DB.
+	- DB -> Collection (table) -> Doc (row) -> Key/value pairs (fields).
+- Redshift: OLAP (Online Analytics Processing).
+- ElastiCache:
+	- In-memory cache in the cloud.
+	- Improves performance of web apps.
+	- Supported caching engines: Memcached, Redis.
+- DMS (Data Migration Service):
+	- Allows you to migrate your production DB to AWS.
+	- AWS manages all the complexities of the migration like data type transformation, compression & parallel transfer.
+	- Converts the source DB schema & a majority of custom code (views, stored procedures & functions).
+
+Data Warehousing:
+- Used for business intelligence.
+- Used to pull in very large & complex data sets.
+
+DynamoDB:
+- NoSQL DB service.
+- Serverless.
+- Stored on SSD storage (fast).
+- Spread across 3 geographically distinct data centers.
+- Fully managed (cannot ssh into it).
+- Single digit ms latency at any scale.
+- Supports doc & key-value data models.
+- Table -> Items (row of data in a table) -> Attributes (column of data in a table).
+- Supports up to 35 levels of nesting.
+- For any AWS account, there is an initial limit of 256 tables p/ region. Contact AWS for increase.
+- No practical limit on the size of a table.
+- The ​BatchGetItem operation returns the attributes of 1 or more items from 1 or more tables. A single operation can retrieve up to 1MB of data, which can contain as many as 100 items.
+- The max item size in DynamoDB is ​400kb. There is no limit on the number of attributes an item can have.
+- Max limit for the size of an item collection is 10GB.
+- Max size by doing a scan or query is ​1MB.
+- Cross table joins natively not supported.
+
+Pricing:
+- Provisioned throughput capacity: Write throughput $0.0065 p/ h for every 10 u, read throughput $0.0065 p/ h for every 50 u.
+- 1st 25GB stored p/ month is free, $0.25 p/ GB p/ month thereafter.
+- Smallest reserved capacity that someone can buy is 100 capacity u (reads or writes).
+
+Data Consistency Models:
+- Eventual consistent reads (default):
+	- Consistency across all copies of data is usually reached within a sec.
+	- Repeating a read after a short time should return the updated data.
+	- Best read performance.
+- Strongly consistency reads:
+	- Returns a result that reflects all writes that received a successful response prior to the read.
+	- Used to keep your data consistent & updated.
+	- Slower than eventual.
+
+Primary Keys:
+- Single attribute (unique ID):
+	- Partition key (or hash key) composed of 1 attribute.
+	- DynamoBD uses the partition key value as input to an internal hash function. The output determines the partition (physical location in which the data is stored).
+	- 2 items in a table cannot have the same partition key.
+- Composite (unique ID & another attribute, typically a range):
+	- Partition key (or hash key) + sort key (or range key) composed of 2 attributes.
+	- DynamoDB uses the partition key value as input to an internal hash function. The output determines the partition (physical location in which the data is stored).
+	- ​2 items in a table can have the same partition key, but they ​must have a different sort key​.
+	- All items with same partition key are stored together, in sorted order by sort key value.
+- When defining primary keys, always use many-to-few principle.
+- Always have primary or hash key for those attributes which will have many values.
+
+Indexes:
+- Data types that can be indexes are Number, String, Binary & Boolean.
+- Global secondary index:
+	- Has different partition key & different sort key.
+	- Can be create on table creation or added later.
+- Local secondary index:
+	- Has same partition key but different sort key.
+	- Can only be created when creating a table (cannot be removed or modified later).
+- You can define a max of 5 local secondary indexes & 5 global secondary indexes p/ table, for a total of 10 secondary indexes.
+
+Streams:
+- Used to capture any modification of a table.
+- Stored for a max of 24 hs.
+- They can trigger a lambda function.
+- If a new item is added to the table, the stream captures an image of the entire item, including all of its attributes.
+- If an item is updated, the stream captures the before & after image of any attributes that were modified in the item.
+- If an item is deleted, the stream captures an image of the entire item before it was deleted.
+
+Query:
+- Finds items in a table using only primary key. 
+- Must provide partition attribute name & distinct value to search for. 
+- Can optionally provide a sort key attribute name & value, & use comparison operator to refine the results. 
+- By default, returns all data attributes for every item, however, a ProjectionExpression parameter can be used so that the query only returns some of the attributes.
+- Results are sorted by sort key. By default, the sort order is ascending. To reverse order, set ScanIndexForward parameter to false.
+- By default is eventually consistent, but can be changed to be strongly consistent.
+
+Scan:
+- Examines every item in the table.
+- By default, returns all data attributes for every item, however, a ProjectionExpression parameter can be used so that the scan only returns some of the attributes.
+- Scans all table & then filters.
+- Use query operation over scan when possible as it is more efficient.
+- To minimize impact of a scan on a table provisioned throughput, set a smaller page size.
+- Max limit of data a scan can retrieve is 1MB.
+
+Provisioned Throughput:
+- Read:
+	- U of read is 4kb. All reads are rounded up to increments of 4kb.
+	- Eventually consistent reads (default) consist of 2 reads p/ sec.
+	- Strongly consistent reads consist of 1 read p/ sec.
+- Write:
+	- All writes are 1kb.
+	- All writes consist of 1 write p/ sec.
+- Formulas:
+	- Reads: (Size of read rounded to nearest increment of 4kb / 4kb) x number of items = read throughput. Divide by 2 if eventually consistent. Capacity unit is p/sec.
+		- Example: Read 10 items of 6kb p/ sec using eventually consistent. What should you set the read throughput to?
+			- 6kb (size of read) rounded to nearest 4kb = 8 (read u).
+			- 8kb (read u) / 4kb = 2 (read u p/ item).
+			- 2 (read u p/ item) x 10 (number of items) = 20 (read throughput).
+			- 20 (read throughput) / 2 (eventually consistent) = 10 (eventually consistent read throughput).
+	- Writes: (Size of write rounded to nearest increment of 1kb x number of items). Capacity unit is p/sec.
+		- Example: Write 10 items of 15.5kb p/ sec. What should you set the write throughput to?
+			- 15.5kb (size of write) rounded to nearest increment of 1kb = 16kb (write u).
+			- 16kb (write u) x 10 (number of items) = 160 (write throughput).
+		- Example: 60 cabs write 1kb every 6 secs.
+			- 1kb (size of write) x 60 (number of items) = 60.
+			- 60 / 6 = 10 (write throughput p/ sec, since it's every 6 secs).
+- If you exceed the the max allowed provisioned throughput for a table or for 1 or more global secondary indexes you will get an 400 HTTP error code (ProvisionedThroughputExceededException).
+
+Web Identity Providers:
+- You can auth users using Web Identity providers with the AssumeRoleWithWebIdentity API.
+- Steps to auth:
+	- User auths with ID provider (FB, Google, etc).
+	- Get the token passed by the provider.
+ 	- Code calls AssumeRoleWithWebIdentity API, provides the token & specifies the ARN for the IAM role.
+	- App can now access DynamoDB from between 15 to 60 mins (default is 60 mins).
+
+Conditional Writes:
+- Allow to update an item only if it meets certain criteria (a change to an attribute will only be written if that attribute value has to changed since it was read).
+- Prevents the inconsistency on data that could be updated with different values at the same time.
+- Are idempotent (can send same conditional write request multiple times but will have no further effect on the item after the 1st time DynamoDB performs the specified update).
+- Use case: When you can't have any margin of error (banking, voting system, etc).
+
+Atomic Counters:
+- When you use the UpdateItem operation to increment or decrement the value of an existing attribute without interfering with other write requests (all write requests are applied in the order in which they were received).
+- Are not idempotent (the counter will increment each time you call UpdateItem).
+- Use case: If you can have a margin of error (web site visitors counter, etc).
+
+Optimistic Locking:
+- Strategy to ensure the client-side item that is being updated or deleted is the same as the item in DynamoDB.
+- Writes are protected from being overwritten by the writes of others (& viceversa).
+- Use Java SDK.
+
+--------------------------------------------------
+SQS (Simple Queue Service):
+- 1st AWS service launched.
+- Distributed queue system, to queue & store msgs that 1 comp generates while awaiting to be processed by another (if the producer server goes down, the msgs are still stored).
+- Used to decouple comps of an app.
+- Msgs can contain up tp 256kb of text in any format. If larger, us Extended Client Library for Java (the msg will contain a ref to a msg payload in S3 that can be as large as 2GB).
+- Min msg size that can be configured is 1kb.
+- Engineered to provide at-least-once delivery of each msg (but apps need to be engineered to avoid conflicts if msg is delivered more than once).
+- Multiple readers & writers can interact with the same queue.
+- A single queue can be used simultaneously by multiple comps.
+- No guarantee of FIFO delivery of msgs (if your system requires order to be preserved, place sequencing info in each msg, to reorder the msgs when the queue returns them).
+- SQS always polls msgs (never pushes them out).
+- Auto scaling can be setup to hit a queue size threshold.
+- NO limit in the number of message queues.
+- You can create any number of queues.
+- Anonymous access is allowed.
+- Protocol versions supported: TLS 1.0, TLS 1.1 & TLS 1.2.
+
+Visibility Timeout Period:
+- Default is 30 secs, max is 12 hs.
+- Starts when the the consumer comp has picked up the msg from the queue.
+- Msg has to be deleted during the visibility timeout period to be considered as completed (if not, another consumer may assume the msg was not finished processing & will pull it again & try to process it).
+- If visibility timeout is insufficient to process & delete the msg, use ChangeMessageVisibility action to specify new timeout. The service then restarts the timeout period using the new value.
+
+Retention Period:
+- Default is 4 days, max is 14 days.
+- You can configure the Amazon SQS msg retention period from 1 min to 14 days.
+- Once the msg retention limit is reached, your msgs are automatically deleted.
+
+Pricing:
+- 1st 1 million of requests p/ month are free.
+- $0.50 p/ million requests p/ month thereafter ($0.00000050 p/ request).
+- A request can have from 1 to 10 msgs, up to a max payload of 256kb.
+- Billed at 64kb chunks. Each 64kb chunk of payload is billed as 1 request (a single API call with 256kb payload will be billed as 4 requests).
+
+Polling:
+- Short polling (standard): Returns immediately, even if the queue is empty.
+- Long polling:
+	- Doesn't return until a msg arrives or long poll times out.
+	- Max long poll time out is 20 secs.
+	- Enable long polling using the AWS Console by setting a ReceiveMessageWaitTimeSeconds​ to a value greater than 0.
+	- Use case: When required to retrieve msgs as soon as available in the queue, when polling in at tight loops is burning CPU cycles & costing the company money.
+
+Fanning Out:
+- Create SNS topic & subscribe multiple SQS queues to that topic.
+- Whenever a msg is sent to the topic, SNS will deliver the msg to all queues that are subscribed.
+
+DLQ (Dead Letter Queues):
+- Config to handle unsuccessfully processed messages in a SQS queue.
+
+SNS (Simple Notification Service):
+- To set up, operate & send notifications.
+- Publish-subscribe (pub-sub) paradigm, with notifications delivered to clients using a push mechanism (instantaneous push-based delivery, no periodically poll required).
+- Inexpensive pay-as-you-go model with no up-front costs.
+- Can push notifications directly to mobile devices, notifications by SMS or email, msgs to SQS queues or deliveries to any HTTP endpoint.
+- To send notification msgs to mobile endpoints, you 1st need to register the app with AWS (get set of credentials in order to be able to connect to the push notification you are trying to set).
+- Notifications are not pushed out to a subscriber until it's confirmed.
+- Once a msg has been published to a topic, it cannot be recalled.
+- Protocols: HTTP, HTTPS, Email, Email-JSON, Amazon SQS, Application, AWS Lambda, SMS.
+- Management console point-&-click interface.
+- To prevent msgs lost, published msgs are stored redundantly across multiple AZs.
+- By default, offers 10 million subscriptions p/ topic, & 100000 topics p/ account. To request a higher limit, please​ ​contact support​.
+- Key-values pairs in Email-JSON: Type, MessageId, TopicArn, Subject, Message, Timestamp, SignatureVersion, Signature, SigningCertURL, UnsubscribeURL, MessageAttributes.
+- In a msg, name, type, value & the msg body cannot be null or empty. Other msg attributes are optional (up to 10 attributes).
+- SNS notifications supported by S3: New object created, object removal & reduced redundancy storage (RRS).
+
+Topics:
+- Access point to allow recipients to subscribe for the same notification.
+- To group multiple recipients.
+- Supports deliveries to multiple endpoint types. SNS will deliver appropriately formatted copies of the msg to each subscriber.
+- Topic names are limited to 256 chars.
+- Max number of topics allowed p/ account is 100000.
+
+Pricing:
+- $0.50 p/ 1 million requests.
+- $0.06 p/ 100000 deliveries over HTTP.
+- $0.75 p/ 100 deliveries over SMS.
+- $2 p/ 100000 deliveries over email.
+
+SWF (Simple Workflow Service):
+- Service to coordinate work (tasks) across distributed app comps.
+- Max workflow time is 1 year & always measured in secs.
+- Consider SWF when human interaction involved & delivery timeframes are longer than 12 hs. Also, for video encoding, media processing, web app backends, business process workflows, analytics pipelines, migration to the cloud, batch processing.
+- Can be managed across AZs.
+
+Workers & Deciders:
+- Task: Represents invocations of various processing steps in an app (executable code, web service calls, human actions, scripts).
+- Worker: Program that interacts with SWF to get tasks, process received tasks & return results.
+- Decider: Program that controls the coordination of tasks (ordering, concurrency, scheduling, according to the app logic).
+- Workers & deciders can run on cloud infrastructure (EC2, lambda, machines behind firewalls).
+- SWF brokers the interaction between workers & deciders, allowing the decider to get consistent views into the progress of tasks & to initiate new tasks.
+- SWF stores tasks, assigns them to workers when ready & monitors their progress.
+- A tasks is assigned only once & is never duplicated.
+- Workers & deciders don't have to keep track of execution state. They can run independently & scale quickly.
+
+Domain:
+- Workflow, activity types & the workflow execution are all scoped to a domain.
+- Domains isolate a set of types, executions & task lists.
+- To register a domain use Management Console or RegisterDomain action from the API (parameters specified in JSON notation).
+- Max registered domains​ is 100.
+- Max number of open activity tasks is 1000.
+- Max workflow & activity types allowed in a domain is 10000.
+
+EB (Elastic Beanstalk):
+- Service to deploy, monitor & scale an app quickly, through a GUI.
+- Highly abstract focus towards infrastructure (comps & performance, not configs & specs).
+- Attempts to remove or significantly simplify infrastructure management.
+- Use when user has not much experience on AWS.
+- If EB creates your RDS DBs then it will delete it when you delete your app. If not then the RDS instance stays.
+- Features can be deployed with EB include auto-scaling groups, ELBs & RDS instances.
+
+Key Architecture Comps:
+- Apps:
+	- Apps are the high level structure in beanstalk.
+	- Your entire app is 1 EB app or each logical comp can be a EB app or a EB environment within an app.
+	- You can update your app or your config, have multiple versions of your app.
+	- Updates can be 1 instance at a time, a percentage of instances (rolling) or an immutable update.
+- Envs:
+	- Apps can have multiple envs (prod, test, dev) or functional type (FE, BE).
+	- Envs are a single instance or scalable.
+	- Envs are either web server envs or worker envs.
+- Versions:
+	- App versions are unique packages which represent versions of apps.
+	- An app is uploaded as a bundle (.zip).
+	- Each app can have many versions (1:M relationship).
+	- App versions can de deployed to envs within an app.
+
+Pricing:
+- Free, you pay for the resources you use.
+
+Available Platforms:
+- Preconfigured: .NET (IIS 7.5, 8.0 & 8.5), Java (Apache Tomcat), Node.js (NGinx or Apache HTTP), PHP (Apache HTTP), Python (Apache HTTP), Ruby (Passenger or Puma), Tomcat, Go, Packer.
+- Preconfigured (Docker): Glassfish, Go, Python.
+- Generic: Docker, Multi-container Docker.
+
+CF (CloudFormation):
+- Gives users an easy way to create & manage a collection of related AWS resources, provisioning & updating them in an orderly & predictable fashion.
+- More powerful & customizable than EB.
+- Route53 is completely supported (includes creating new hosted zones or updating).
+- You can create A Records, Aliases, etc.
+- IAM role creation & assignment is supported.
+- Use when trying to turn infrastructure into code & provision stacks across multiple regions.
+- Can be used with Chef & Puppet.
+- Natively supports creation of NACLs, route tables & EC2s.
+
+Templates & Stacks:
+- Template: Architectural diagram, in JSON or YAML format.
+- Stack:
+	- End result of that diagram (what is actually provisioned).
+	- Stacks can wait for apps to be provisioned using the WaitCondition.
+	- There is a limit of 200 stacks in a region. If you want to increase it, contact AWS.
+- Create, update, delete collection of resources by creating, updating & deleting stacks using CF templates.
+- Data can be saved when deleting a stack by using deletion policies.
+- By default, automatic rollback on error feature is enabled. Previously created resources are deleted & stack creation terminates.
+- Template elements:
+	- Mandatory:
+		- List of AWS resources & their associated config values.
+		- The Resources section is the only required section.
+	- Optional:
+		- Template's file format & version number. Will assume a default version if one is not explicitly mentioned.
+		- Template parameters: Input values supplied at stack creation time (like tags associated to the EC2 instances, actual EC2 instances, etc). Limit of 60.
+		- Output values: Output values required once stack has finished building (like public IP address, ELB address, etc). Limit of 60.
+		- List of data tables: Used to look up static config values (like AMI's).
+- Fn:GetAtt returns the value of an attribute from a resource in the template.
+- Fn::FindInMap return the value corresponding to keys in 2-level map declared in Mappings section.
+- Fn::Join appends a set of values, separated by specified delimiter.
+- Fn::Select returns the object from list of objects in the specified index.
+- Fn::Split splits a string into a list of string using the specified delimiter.
+- Intrinsic functions can only be used in specific parts of a template: Resource properties, outputs, metadata attributes & update policy attributes, or to conditionally create stack resources.
+- ListStackResources API call is used to list all resources that belong to a CF stack.
+- Lis all current stacks in you CF service with list-stacks or describe-stacks.
+
+Pricing:
+- Free, you pay for the resources you use.
+- Your are charged for errors.
+
+--------------------------------------------------
+Shared Responsibility Model:
+- Infrastructure Services:
+	- EC2, EBS, VPC.
+	- AWS responsibility:
+		- AWS endpoints.
+		- AWS global infrastructure (regions, AZs, edge locations).
+		- Foundation services (compute, storage, DBs, networking)
+	- Customer responsibility:
+		- Client-side data encryption & data integrity authentication.
+		- Server-side encryption.
+		- Network traffic protection.
+		- OS, network & firewall config.
+		- Platform & app management.
+		- Customer data.
+- Container Services:
+	- RDS, EMR.
+	- AWS responsibility:
+		- AWS endpoints.
+		- AWS global infrastructure.
+		- Foundation services.
+		- OS & network config.
+		- Platform & app management.
+	- Customer responsibility:
+		- Client-side data encryption & data integrity authentication.
+		- Network traffic protection.
+		- Firewall config.
+		- Customer data.
+- Abstracted Services:
+	- S3, DynamoDB, Lambda.
+	- AWS responsibility:
+		- AWS endpoints.
+		- AWS global infrastructure.
+		- Foundation services.
+		- OS, network & firewall config.
+		- Platform & app management.
+		- Network traffic protection provided by the platform.
+		- Server side encryption provided by the platform.
+	- Customer responsibility:
+		- Client-side data encryption & data integrity authentication.
+		- Customer data.
+
+--------------------------------------------------
+DNS (Domain Name System):
+- Used to convert human friendly domain names into IP address.
+- ELBs do not have pre-defined IPv4 addresses, you resolve to them using a DNS name.
+- IP types: 
+	- IPv4: Space for 32 bit field.
+	- IPv6: Created to solve depletion issues & has space of 128bits.
+- Can use VPCs with IPv6 ranges now.
+
+Domain Names:
+- Last word represents the top level domain (.com).
+- The 2nd word is known as 2nd level domain name (.co in .co.uk).
+- Top level domain names are controlled by the IANA (Internet Assigned Numbers Authority) in a root zone db (http://www.iana.org/domains/root/db).
+
+Domain Registrars:
+- Authority that can assign domain names directly under 1 or more top-level domains.
+- These domains are registered with InterNIC (an ICANN service) which enforces uniqueness.
+- Each domain name becomes registered in a central DB known as the WhoIS DB.
+
+Domain Registration:
+- Not part of the free tier. Prices in https://aws.amazon.com/route53/pricing/.
+- Email verification.
+- May take 3 days to complete.
+- You need the NS record & the SOA record.
+
+SOA (Start Of Authority) Record:
+- Name of server that supplied data for the zone.
+- Admin of the zone.
+- Current version of data file.
+- Number of secs a secondary name server should wait before checking for updates.
+- Number of secs a secondary name server should wait before retrying a failed zone transfer.
+- Max number of secs that a secondary name server can use data before it must either be refreshed or expire.
+- Default number of secs for the TTL file on resource records.
+
+NS (Name Server) Record:
+- Used to direct traffic to the content DNS server which contains the authoritative DNS records.
+
+A (Address) Record:
+- Fundamental type of DNS record.
+- Used by a computer to translate the name of the domain to the IP address.
+
+TTL (Time to Live) Record:
+- Length in secs that a DNS record is cached on either the resolving server or the users local PC.
+- The lower TTL, the faster changes to DNS records take to propagate throughout the internet.
+- When doing a DNS migration, lower the TTLs of all your DNS records down to 300 secs, do the migration 2 days later (by default most TTLs are set for 2 days) so users only have issues between going to the old site & the new during those 300 secs.
+
+CNAME (Canonical Name):
+- Used to resolve 1 domain name to another.
+- You will be charge if you make a request to Route53 through CNAME.
+- A CNAME can't be used for naked domain names (without the www or zone apex record).
+
+Alias Record:
+- Created by AWS.
+- Used to map resource record sets in your hosted zone to ELBs, CloudFront distributions or S3 buckets configured as websites (like CNAME except you can resolve to individual AWS resources too).
+- Alias resource records sets can save you time because Route53 automatically recognizes changes in the record sets that the alias resource record set refers to.
+- You are not charged if you make a request to Route53 through an Alias record.
+- Work like a CNAME in that you can map 1 DNS name to another target DNS name.
+- An Alias can be used for naked domain names (without the www or zone apex record).
+- Given the choice, always choose an Alias Record over a CNAME.
+
+Route53:
+- Global service (no region, applies al across the world).
+
+Routing Policies:
+- Simple:
+	- Default when you create a new record set.
+	- Most commonly used when you have a single resource that performs a given function for your domain (you only have 1 web server).
+	- Round robin.
+	- Example: A web server that serves content for the http://website.com.
+- Weighted:
+	- Allows you to split your traffic based on different weights assigned.
+	- Does this over a period of time (the length of a day).
+	- Can be 2 different ELBs in the same region.
+	- Used for AB testing.
+	- Example: Set 10% of your traffic to US-EAST-1 & 90% to EU-WEST-1.
+- Latency:
+	- Allows to route your traffic based on the lowest network latency for the end user (which region will give them the latest response time).
+	- To use, create a latency resource record set for the ELB or EC2 resource in each region that hosts your website.
+	- Example: South African user will go to EU-WEST-2 (54ms) instead of AP-SOUTHEAST-2 (300ms).
+- Failover:
+	- Used when you want to create active & passive set up.
+	- You have a primary site & secondary, Route53 will monitor the health of your primary site, if the health check fails it's going to send out all traffic to the secondary.
+	- Example: Route53 sends all traffic to AP-SOUTHEAST-2 because it detected a failure in EU-WEST-2.
+- Geolocation:
+	- Lets you choose where your traffic will be sent based on the geographic location of your users (location from which DNS queries originates).
+	- Example: All queries from Europe are routed to a fleet of EC2 instances specifically configured for European customers.
+
+--------------------------------------------------
+VPC (Virtual Private Cloud):
+- Virtual datacenter in the cloud.
+- Every region has their own VPC.
+- Complete control over your virtual networking environment.
+- Consists of internal gateways (or virtual private gateways), route tables, NACLs (network access control lists), subnets & SG (security groups).
+- SG are stateful, NACLs are stateless.
+- 1 subnet equals to 1 AZ, smallest have a subnet mask of /28 (16 IP addresses).
+- You will lose 5 IP addresses when creating a subnet:
+	- 10.0.0.0: Network address.
+	- 10.0.0.1: Reserved by AWS for the VPC router.
+	- 10.0.0.2: Reserved by AWS. The IP address of the DNS server is always the base of the VPC network range plus 2.
+	- 10.0.0.3: Reserved by AWS for future use.
+	- 10.0.0.255: Network broadcast address. We do not support broadcast in a VPC.
+- Private IPs:	
+	- 10.0.0.0/8.
+	- 172.16.0.0/12.
+	- 192.168.0.0/16.
+- Can connect with your existing data center through the use of a VPN.
+- Can have multiple VPCs inside a region, max limit is 5.
+- Max number of subnets that can be created p/VPC is 200.
+- Actions you can do:
+	- Launch instances into different subnets.
+	- Assign custom IP address ranges in each subnet.
+	- Configure route tables between subnets (which subnets can speak to other subnets).
+	- Create IG (Internet Gateway) & attach it to VPC (1 p/ VPC, there’s no way to speed up the connection).
+	- Much better security controls.
+	- Instance SGs.
+	- Subnet NACLs.
+
+Pricing:
+- Free, you pay for the resources you use.
+- VPC-VPN is charged p/ VPN connection p/ h. Data transferred over VPN connections is charged.
+
+Default VPC vs Custom VPC:
+- Default VPC is user friendly, allowing you to immediately deploy instances.
+- All subnets in default VPC have a route out to the internet.
+- Each EC2 instance has both a public & private IP address.
+
+VPC Peering:
+- Allows you to connect 1 VPC with another via a direct network route using private IP addresses.
+- Instances behave as if they were on the same private network.
+- You can peer VPCs with another AWS accounts as well as with other VPCs in the same account.
+- Peering is in a start config (1 central VPC peers with 4 others). No transitive peering.
+
+NAT (Network Access Translation) Instance:
+- EC2 instance that works as a gateway for internet traffic. Used to provide internet traffic to EC2 instances in private subnets.
+- Route table uses NAT instance.
+- Has source & destination checks disabled. Each EC2 instance performs source & destination check by default. The instance must be the source or destination of any traffic it sends or receives. However, a NAT instance must be able to send & receive traffic when the source or destination is not itself.
+- NAT instances must be in a public subnet. There must be a route out of the private subnet to the NAT instance, in order for this to work.
+- Prone to bottlenecks. The amount of traffic that NAT instances can support depends on the instance size. If you are bottlenecking, increase the instance size.
+- You can create high availability using auto scaling groups, multiple subnets in different AZs & a script to automate failover.
+- Behind a security group.
+
+NAT Gateway:
+- Preferred by enterprise.
+- Scale up automatically to 10GBps.
+- No need to patch.
+- Not associated with SGs.
+- Automatically assigned IP public address.
+- Remember to update route tables.
+- No need to disable source & destination checks.
+- More secure than a NAT instance.
+- NAT gateways only IPv4.
+
+NACL (Network Access Control Lists):
+- Your VPC automatically comes with a default NACL (by default it allows all outbound & inbound traffic).
+- You can create custom NACLs (by default, each custom NACL denies all inbound & outbound traffic until you add rules).
+- Each subnet in your VPC must be associated with a network ACL. If you don't explicitly associate a subnet with a NACL, the subnet is automatically associated with the default NACL.
+- You can associate a NACL with multiple subnets. However, a subnet can be associated with only 1 NACL at a time. When you associate a NACL with a subnet, the previous association is removed.
+- NACLs contain a numbered list of rules that are evaluated in order, starting with the lowest numbered rule. Rules are recommended to go in 100 increments so if you make a mistake you can correct it enough number of times.
+- NACLs have separate inbound & outbound rules, each rule can either allow or deny traffic.
+- NACLs are stateless, responses to allowed inbound traffic are subject to the rules for outbound traffic (& viceversa).
+- Ephemeral ports:
+	- Port randomly assigned when a client connects to a server.
+	- Varies for OS.
+	- Amazon makes the client choose the port that will be used.
+- NACLs evaluated before SGs.
+- Block IP addresses using network ACLs, not SGs.
+
+LBs & Custom VPCs:
+- If you select a custom VPC for your LB it must fulfill the next requirements:
+	- You can only specify 1 subnet p/ AZ.
+	- You must specify subnets from at least 2 AZs. These AZ subnets must be public.
+
+Flow Logs:
+- Enables you to capture information about the IP traffic going to & from network interfaces in your VPC.
+- Data is stored using Amazon CloudWatch Logs.
+- Can be created at 3 levels: VPC, subnet, network interface.
+- Need IAM role to be able to log to CloudWatch.
+- Needs log group on CloudWatch.
+- Can be used with lambdas.
+- Cannot enable flow logs for VPCs that are peered with your VPC, unless the peer VPC is in your account.
+- You cannot tag a flow log.
+- After a flow log is created, you cannot change its config.
+- Not all IP traffic is monitored:
+	- Traffic generated by instances when they contact the Amazon DNS server. If you use your own DNS server, then all the traffic to that DNS server is logged.
+	- Traffic generated by a Windows instance for Amazon Windows license activation.
+	- Traffic to & from 169.254.169.254 for instance metadata.
+	- DHCP traffic.
+	- Traffic to the reserved IP address for the default VPC router.
+
+Bastions:
+- Used to securely administer EC2 instances (using SSH or RDP) in private subnets.
+- Need min config & public IP address.
+
+VPC Endpoint:
+- Securely connects a VPC to another service (like S3).
+- They connect to services using the private IP addresses.
